@@ -26,11 +26,32 @@ class DataController {
             guard error == nil else {
                 fatalError(error?.localizedDescription ?? "There was an error loading the store")
             }
+            self.autoSaveViewContext()
             completion?()
         }
         
     }
     
+}
+extension DataController {
+    
+    func autoSaveViewContext(interval: TimeInterval = 30) {
+        guard interval > 0 else {
+            print("cannot have negative save interval")
+            return
+        }
+        if viewContext.hasChanges {
+            guard let _ = try? viewContext.save() else {
+            print("unable to save viewContext changes")
+            return }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + interval) {
+            self.autoSaveViewContext(interval: interval)
+        }
+    }
     
     
 }
+
+
+

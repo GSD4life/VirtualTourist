@@ -17,6 +17,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     var loadedSavedRegion = false
     var pin: [Pin]?
     
+    
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var deletePinsLabel: UILabel!
     @IBOutlet weak var editButton: UIBarButtonItem!
@@ -27,11 +28,11 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         fetchRequest.sortDescriptors = [sortDescriptor]
         if let result = try? dataController.viewContext.fetch(fetchRequest) {
            pin = result
+           print(result)
         }
 
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
-        dataController.viewContext.performAndWait {
 
         do {
             try fetchedResultsController.performFetch()
@@ -39,15 +40,14 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
             fatalError("The fetch request could not be performed: \(error.localizedDescription)")
         }
         loadPins()
-    }
 }
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self
         deletePinsLabel.isHidden = true
         
+        addGestureRecognizer()
         
-        _ = UILongPressGestureRecognizer(target: self, action: #selector(pressedLocation))
         
         //setupFetchResultsController()
         
@@ -58,6 +58,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         super.viewWillAppear(animated)
        
     }
+    
     
     // udacity forums
     override func viewDidAppear(_ animated: Bool) {
@@ -76,6 +77,13 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         fetchedResultsController = nil
+    }
+    
+    func addGestureRecognizer() {
+        let gestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(pressedLocation))
+        gestureRecognizer.minimumPressDuration = 0.5
+        mapView.isUserInteractionEnabled = true
+        mapView.addGestureRecognizer(gestureRecognizer)
     }
     
     
@@ -111,8 +119,17 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     
     
     @objc func pressedLocation(_ sender: UILongPressGestureRecognizer) {
+        if sender.state == .began {
         let areaPressed = sender.location(in: mapView)
-        let _ = mapView.convert(areaPressed, toCoordinateFrom: mapView)
+        let location = mapView.convert(areaPressed, toCoordinateFrom: mapView)
+            
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = location
+        annotation.title = "Ninpo"
+       
+        
+        mapView.addAnnotation(annotation)
+       }
     }
     
     
@@ -142,6 +159,32 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
             ]
             UserDefaults.standard.set(regionToSave, forKey: "savedMapRegion")
         }
+    }
+    
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        mapView.deselectAnnotation(view.annotation, animated: true)
+        let _ = performSegue(withIdentifier: "PhotoAlbumVC", sender: self)
+        
+    }
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
+        let reuseId = "pin"
+        
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
+        
+        if pinView == nil {
+            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.canShowCallout = true
+            pinView!.pinTintColor = .red
+            pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+            
+        }
+        else {
+            pinView!.annotation = annotation
+        }
+        
+        return pinView
     }
     
 }
