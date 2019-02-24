@@ -15,7 +15,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     var dataController: DataController!
     var fetchedResultsController: NSFetchedResultsController<Pin>!
     var loadedSavedRegion = false
-    var pin: [Pin]?
+    var pins: [Pin] = []
     
     
     @IBOutlet weak var mapView: MKMapView!
@@ -24,12 +24,8 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     
     fileprivate func setupFetchResultsController() {
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
-        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true)
+        let sortDescriptor = NSSortDescriptor(key: "latitude", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor]
-        if let result = try? dataController.viewContext.fetch(fetchRequest) {
-           pin = result
-           print(result)
-        }
 
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
@@ -47,8 +43,6 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         deletePinsLabel.isHidden = true
         
         addGestureRecognizer()
-        
-        
         //setupFetchResultsController()
         
         // Do any additional setup after loading the view, typically from a nib.
@@ -63,7 +57,11 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     // udacity forums
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        savedMapRegion()
         
+    }
+    
+    func savedMapRegion() {
         if !loadedSavedRegion {
             if let savedRegion = UserDefaults.standard.object(forKey: "savedMapRegion") as? [String: Double] {
                 let center = CLLocationCoordinate2D(latitude: savedRegion["mapRegionCenterLat"] ?? 0.0, longitude: savedRegion["mapRegionCenterLon"] ?? 0.0)
@@ -81,6 +79,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     
     func addGestureRecognizer() {
         let gestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(pressedLocation))
+        gestureRecognizer.delegate = self
         gestureRecognizer.minimumPressDuration = 0.5
         mapView.isUserInteractionEnabled = true
         mapView.addGestureRecognizer(gestureRecognizer)
@@ -96,6 +95,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     }
     
     fileprivate func loadPins() {
+        
         if let fetchedObjects = fetchedResultsController.fetchedObjects {
             var annotations = [MKPointAnnotation]()
             
@@ -103,13 +103,14 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
                 let latitude = CLLocationDegrees(pinObjects.latitude)
                 let longitude = CLLocationDegrees(pinObjects.longitude)
                 
-                let coordinates = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                    let coordinates = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                    
+                    let annotation = MKPointAnnotation()
+                    annotation.coordinate = coordinates
+                    
+                    
+                    annotations.append(annotation)
                 
-                let annotation = MKPointAnnotation()
-                annotation.coordinate = coordinates
-                
-                
-                annotations.append(annotation)
             }
             mapView.addAnnotations(annotations)
         }
@@ -125,11 +126,24 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
             
         let annotation = MKPointAnnotation()
         annotation.coordinate = location
-        annotation.title = "Ninpo"
+        //annotation.title = "Ninpo"
        
         
         mapView.addAnnotation(annotation)
+        //addPin(location: location)
        }
+    }
+    
+    func addPin(location: CLLocationCoordinate2D) {
+      let pin = Pin(context: dataController.viewContext)
+      pin.longitude = location.longitude
+      pin.latitude = location.latitude
+      pin.creationDate = Date()
+        do {
+            try dataController.viewContext.save()
+        } catch {
+            fatalError(error.localizedDescription)
+        }
     }
     
     
@@ -140,7 +154,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         //  Look through gesture recognizers to determine whether this region change is due to user interaction
         if let gestureRecognizers = view.gestureRecognizers {
             for recognizer in gestureRecognizers {
-                if (recognizer.state == UIGestureRecognizer.State.began || recognizer.state == UIGestureRecognizer.State.ended) {
+                if (recognizer.state == .began || recognizer.state == .ended) {
                     return true
                 }
             }
@@ -157,13 +171,17 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
                 "mapRegionSpanLatDelta": mapView.region.span.latitudeDelta,
                 "mapRegionSpanLonDelta": mapView.region.span.longitudeDelta
             ]
-            UserDefaults.standard.set(regionToSave, forKey: "savedMapRegion")
+            
+            _ = UserDefaults.standard.set(regionToSave, forKey: "savedMapRegion")
+            
         }
     }
     
+    
+    
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         mapView.deselectAnnotation(view.annotation, animated: true)
-        let _ = performSegue(withIdentifier: "PhotoAlbumVC", sender: self)
+         _ = performSegue(withIdentifier: "PhotoAlbumVC", sender: self)
         
     }
     
@@ -178,7 +196,6 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
             pinView!.canShowCallout = true
             pinView!.pinTintColor = .red
             pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
-            
         }
         else {
             pinView!.annotation = annotation

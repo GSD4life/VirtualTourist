@@ -29,12 +29,12 @@ extension FlickrClient {
             ] as [String:AnyObject]
         
         
-         let _ = taskForGet(parameters: methodParameters) { (data, error) in
+         _ = taskForGet(parameters: methodParameters) { (data, error) in
             func displayError(_ error: String) {
                 print(error)
             }
             
-            guard error == nil else {
+            guard (error == nil) else {
                 displayError("There was an error with your request: \(error?.localizedDescription ?? "Api error")")
                 completionHandlerForPhotos(false, nil, error)
                 return

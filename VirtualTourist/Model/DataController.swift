@@ -21,9 +21,9 @@ class DataController {
         persistentContainer = NSPersistentContainer(name: modelName)
     }
     
-    func load(_ completion: (() -> Void)? = nil)  {
+    func load(completion: (() -> Void)? = nil)  {
         persistentContainer.loadPersistentStores { (storeDescription, error) in
-            guard error == nil else {
+            guard (error == nil) else {
                 fatalError(error?.localizedDescription ?? "There was an error loading the store")
             }
             self.autoSaveViewContext()
@@ -36,6 +36,8 @@ class DataController {
 extension DataController {
     
     func autoSaveViewContext(interval: TimeInterval = 30) {
+        print("autosaving")
+        
         guard interval > 0 else {
             print("cannot have negative save interval")
             return
