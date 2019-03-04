@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1920ADD4222DA3D90085E325 /* GCDBlackBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1920ADD3222DA3D90085E325 /* GCDBlackBox.swift */; };
 		1934885D22160535007C1E7C /* Photo+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1934885C22160535007C1E7C /* Photo+Extensions.swift */; };
 		1934885F22160574007C1E7C /* Pin+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1934885E22160574007C1E7C /* Pin+Extensions.swift */; };
 		194B7845220B342300E4E122 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194B7844220B342300E4E122 /* AppDelegate.swift */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1920ADD3222DA3D90085E325 /* GCDBlackBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCDBlackBox.swift; sourceTree = "<group>"; };
 		1934885C22160535007C1E7C /* Photo+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Photo+Extensions.swift"; sourceTree = "<group>"; };
 		1934885E22160574007C1E7C /* Pin+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pin+Extensions.swift"; sourceTree = "<group>"; };
 		194B7841220B342300E4E122 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -80,6 +82,7 @@
 			isa = PBXGroup;
 			children = (
 				194B7844220B342300E4E122 /* AppDelegate.swift */,
+				1920ADD3222DA3D90085E325 /* GCDBlackBox.swift */,
 				1934885B221602C1007C1E7C /* Managed Object Extensions */,
 				194B7858220B391F00E4E122 /* Model */,
 				194B7859220B392C00E4E122 /* ViewControllers */,
@@ -187,6 +190,7 @@
 				19EB9FC22214A09E00ECDEC2 /* PhotoAlbumVC.swift in Sources */,
 				19774D6A220C6D7E00EE89A6 /* Constants.swift in Sources */,
 				1934885F22160574007C1E7C /* Pin+Extensions.swift in Sources */,
+				1920ADD4222DA3D90085E325 /* GCDBlackBox.swift in Sources */,
 				194B785C220B555300E4E122 /* VirtualTourist.xcdatamodeld in Sources */,
 				194B7847220B342300E4E122 /* TravelLocationsMapVC.swift in Sources */,
 				194B7857220B390B00E4E122 /* DataController.swift in Sources */,
