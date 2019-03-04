@@ -16,6 +16,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     var fetchedResultsController: NSFetchedResultsController<Pin>!
     var loadedSavedRegion = false
     var pins: [Pin] = []
+    var mapCoordinates = CLLocationCoordinate2D()
     
     
     @IBOutlet weak var mapView: MKMapView!
@@ -26,17 +27,17 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "latitude", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor]
-
+        
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
-
+        
         do {
             try fetchedResultsController.performFetch()
         } catch {
             fatalError("The fetch request could not be performed: \(error.localizedDescription)")
         }
         loadPins()
-}
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self
@@ -50,7 +51,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-       
+        
     }
     
     
@@ -87,12 +88,24 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     
     
     @IBAction func editButtonPressed(_ sender: Any) {
-        editButton.title = "Done"
-        deletePinsLabel.isHidden = false
-        
-        
-        
+        editingMode()
     }
+    
+    func editingMode() {
+      deletePinsLabel.isHidden = false
+      editButton.title = "Done"
+      mapView.frame.origin.y -= deletePinsLabel.frame.height
+    }
+    
+    func notInEditingMode() {
+     deletePinsLabel.isHidden = true
+     editButton.title = "Edit"
+     mapView.frame.origin.y += deletePinsLabel.frame.height
+     
+    }
+    
+    
+    
     
     fileprivate func loadPins() {
         
@@ -103,13 +116,13 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
                 let latitude = CLLocationDegrees(pinObjects.latitude)
                 let longitude = CLLocationDegrees(pinObjects.longitude)
                 
-                    let coordinates = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                    
-                    let annotation = MKPointAnnotation()
-                    annotation.coordinate = coordinates
-                    
-                    
-                    annotations.append(annotation)
+                let coordinates = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = coordinates
+                
+                
+                annotations.append(annotation)
                 
             }
             mapView.addAnnotations(annotations)
@@ -121,24 +134,25 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     
     @objc func pressedLocation(_ sender: UILongPressGestureRecognizer) {
         if sender.state == .began {
-        let areaPressed = sender.location(in: mapView)
-        let location = mapView.convert(areaPressed, toCoordinateFrom: mapView)
+            let areaPressed = sender.location(in: mapView)
+            let location = mapView.convert(areaPressed, toCoordinateFrom: mapView)
             
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = location
-        //annotation.title = "Ninpo"
-       
-        
-        mapView.addAnnotation(annotation)
-        //addPin(location: location)
-       }
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = location
+            mapCoordinates = location
+            //annotation.title = "Ninpo"
+            
+            
+            mapView.addAnnotation(annotation)
+            //addPin(location: location)
+        }
     }
     
     func addPin(location: CLLocationCoordinate2D) {
-      let pin = Pin(context: dataController.viewContext)
-      pin.longitude = location.longitude
-      pin.latitude = location.latitude
-      pin.creationDate = Date()
+        let pin = Pin(context: dataController.viewContext)
+        pin.longitude = location.longitude
+        pin.latitude = location.latitude
+        pin.creationDate = Date()
         do {
             try dataController.viewContext.save()
         } catch {
@@ -177,11 +191,16 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         }
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! PhotoAlbumVC
+        destinationVC.coordinates = mapCoordinates
+    }
+    
     
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         mapView.deselectAnnotation(view.annotation, animated: true)
-         _ = performSegue(withIdentifier: "PhotoAlbumVC", sender: self)
+        _ = performSegue(withIdentifier: "PhotoAlbumVC", sender: self)
         
     }
     
@@ -193,9 +212,10 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.animatesDrop = true
             pinView!.canShowCallout = true
             pinView!.pinTintColor = .red
-            pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+            //pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
         }
         else {
             pinView!.annotation = annotation

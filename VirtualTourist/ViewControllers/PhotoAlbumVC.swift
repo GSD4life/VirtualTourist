@@ -9,17 +9,30 @@
 import UIKit
 import MapKit
 
-class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
-    
+class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, MKMapViewDelegate {
+
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var okButton: UIBarButtonItem!
+    
+    var coordinates = CLLocationCoordinate2D()
+    var pin: Pin!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        mapView.delegate = self
         okButtonPressed(okButton)
-       
+        showMapItem()
     }
+    
+    func showMapItem() {
+        
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinates
+        mapView.addAnnotation(annotation)
+        mapView.isUserInteractionEnabled = false
+    }
+    
     
     
     @IBAction func okButtonPressed(_ sender: UIBarButtonItem) {
@@ -28,12 +41,32 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     
     
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
+        
+        let reuseId = "mapPin"
+        
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
+        
+        if pinView == nil {
+        pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+        pinView!.animatesDrop = true
+        pinView!.pinTintColor = .red
+        
+        }
+        
+        else {
+        pinView!.annotation = annotation
+    }
+        return pinView!
+
+    }
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return section
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)

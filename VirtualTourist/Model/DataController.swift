@@ -22,7 +22,7 @@ class DataController {
     }
     
     func load(completion: (() -> Void)? = nil)  {
-        persistentContainer.loadPersistentStores { (storeDescription, error) in
+        persistentContainer.loadPersistentStores { [unowned self] (storeDescription, error) in
             guard (error == nil) else {
                 fatalError(error?.localizedDescription ?? "There was an error loading the store")
             }

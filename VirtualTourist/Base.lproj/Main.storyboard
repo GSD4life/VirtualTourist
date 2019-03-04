@@ -78,6 +78,9 @@
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="vAL-g3-IXF">
                                 <rect key="frame" x="0.0" y="87" width="375" height="87"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="87" id="bxR-vB-tsH"/>
+                                </constraints>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="eSs-pl-Aqj">
                                 <rect key="frame" x="0.0" y="182" width="375" height="401"/>
@@ -99,9 +102,8 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hA9-gh-esF">
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hA9-gh-esF">
                                 <rect key="frame" x="0.0" y="43" width="375" height="44"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
                                     <navigationItem id="UeH-zc-Shh">
                                         <barButtonItem key="leftBarButtonItem" title="OK" id="ty5-88-J0l">
@@ -117,12 +119,14 @@
                         <constraints>
                             <constraint firstItem="3RT-oa-JD2" firstAttribute="bottom" secondItem="eSs-pl-Aqj" secondAttribute="bottom" constant="84" id="1j7-ih-03a"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="trailing" secondItem="eSs-pl-Aqj" secondAttribute="trailing" id="3mR-l4-W4R"/>
+                            <constraint firstItem="vAL-g3-IXF" firstAttribute="top" secondItem="hA9-gh-esF" secondAttribute="bottom" id="Fx0-ux-gqw"/>
                             <constraint firstItem="eSs-pl-Aqj" firstAttribute="leading" secondItem="3RT-oa-JD2" secondAttribute="leading" id="JCz-Rj-aaS"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="leading" secondItem="eSs-pl-Aqj" secondAttribute="leading" id="NpJ-iY-hhZ"/>
                             <constraint firstItem="3RT-oa-JD2" firstAttribute="trailing" secondItem="eSs-pl-Aqj" secondAttribute="trailing" id="TGm-i2-GQj"/>
+                            <constraint firstItem="hA9-gh-esF" firstAttribute="leading" secondItem="vAL-g3-IXF" secondAttribute="leading" id="ZCn-nN-DpK"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="top" secondItem="3RT-oa-JD2" secondAttribute="top" constant="67" id="ZyL-en-m44"/>
-                            <constraint firstItem="eSs-pl-Aqj" firstAttribute="top" secondItem="3RT-oa-JD2" secondAttribute="top" constant="162" id="bGE-VO-RlL"/>
                             <constraint firstItem="eSs-pl-Aqj" firstAttribute="top" secondItem="vAL-g3-IXF" secondAttribute="bottom" constant="8" id="kza-A8-XrX"/>
+                            <constraint firstItem="hA9-gh-esF" firstAttribute="trailing" secondItem="vAL-g3-IXF" secondAttribute="trailing" id="moE-uO-z45"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="top" secondItem="3RT-oa-JD2" secondAttribute="top" constant="67" id="oXJ-gZ-y3f"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="3RT-oa-JD2"/>
