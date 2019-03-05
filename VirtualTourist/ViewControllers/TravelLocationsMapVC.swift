@@ -88,20 +88,24 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     
     
     @IBAction func editButtonPressed(_ sender: Any) {
-        editingMode()
+        if editButton.title == "Edit" {
+            editingMode()
+        } else {
+            notInEditingMode()
+        }
     }
     
     func editingMode() {
-      deletePinsLabel.isHidden = false
-      editButton.title = "Done"
-      mapView.frame.origin.y -= deletePinsLabel.frame.height
+        deletePinsLabel.isHidden = false
+        editButton.title = "Done"
+        mapView.frame.origin.y -= deletePinsLabel.frame.height
     }
     
     func notInEditingMode() {
-     deletePinsLabel.isHidden = true
-     editButton.title = "Edit"
-     mapView.frame.origin.y += deletePinsLabel.frame.height
-     
+        deletePinsLabel.isHidden = true
+        editButton.title = "Edit"
+        mapView.frame.origin.y += deletePinsLabel.frame.height
+        
     }
     
     
@@ -194,6 +198,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destinationVC = segue.destination as! PhotoAlbumVC
         destinationVC.coordinates = mapCoordinates
+        destinationVC.dataController = dataController
     }
     
     

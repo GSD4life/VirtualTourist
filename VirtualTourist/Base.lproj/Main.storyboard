@@ -83,7 +83,7 @@
                                 </constraints>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="eSs-pl-Aqj">
-                                <rect key="frame" x="0.0" y="182" width="375" height="401"/>
+                                <rect key="frame" x="0.0" y="182" width="375" height="357"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="JFV-u9-73u">
                                     <size key="itemSize" width="92" height="132"/>
@@ -106,7 +106,7 @@
                                 <rect key="frame" x="0.0" y="43" width="375" height="44"/>
                                 <items>
                                     <navigationItem id="UeH-zc-Shh">
-                                        <barButtonItem key="leftBarButtonItem" title="OK" id="ty5-88-J0l">
+                                        <barButtonItem key="leftBarButtonItem" title="Ok" id="ty5-88-J0l">
                                             <connections>
                                                 <action selector="okButtonPressed:" destination="GZa-pb-wjp" id="Oaj-hY-P5h"/>
                                             </connections>
@@ -131,6 +131,8 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="3RT-oa-JD2"/>
                     </view>
+                    <toolbarItems/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="mapView" destination="vAL-g3-IXF" id="0ZX-Da-PzP"/>
                         <outlet property="okButton" destination="ty5-88-J0l" id="1p9-S0-8yp"/>
@@ -138,7 +140,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3gR-ke-kHI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3368.8000000000002" y="-169.56521739130437"/>
+            <point key="canvasLocation" x="3329" y="-186"/>
         </scene>
     </scenes>
 </document>

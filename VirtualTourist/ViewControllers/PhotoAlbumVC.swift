@@ -14,6 +14,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var okButton: UIBarButtonItem!
     
+    
+    var dataController: DataController!
     var coordinates = CLLocationCoordinate2D()
     var pin: Pin!
     
