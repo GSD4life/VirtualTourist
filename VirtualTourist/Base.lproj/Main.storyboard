@@ -114,20 +114,27 @@
                                     </navigationItem>
                                 </items>
                             </navigationBar>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="m5f-T0-hMu">
+                                <rect key="frame" x="0.0" y="593" width="375" height="30"/>
+                                <state key="normal" title="New Collection"/>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="3RT-oa-JD2" firstAttribute="bottom" secondItem="eSs-pl-Aqj" secondAttribute="bottom" constant="84" id="1j7-ih-03a"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="trailing" secondItem="eSs-pl-Aqj" secondAttribute="trailing" id="3mR-l4-W4R"/>
+                            <constraint firstItem="3RT-oa-JD2" firstAttribute="trailing" secondItem="m5f-T0-hMu" secondAttribute="trailing" id="Cxq-TG-eGo"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="top" secondItem="hA9-gh-esF" secondAttribute="bottom" id="Fx0-ux-gqw"/>
                             <constraint firstItem="eSs-pl-Aqj" firstAttribute="leading" secondItem="3RT-oa-JD2" secondAttribute="leading" id="JCz-Rj-aaS"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="leading" secondItem="eSs-pl-Aqj" secondAttribute="leading" id="NpJ-iY-hhZ"/>
                             <constraint firstItem="3RT-oa-JD2" firstAttribute="trailing" secondItem="eSs-pl-Aqj" secondAttribute="trailing" id="TGm-i2-GQj"/>
                             <constraint firstItem="hA9-gh-esF" firstAttribute="leading" secondItem="vAL-g3-IXF" secondAttribute="leading" id="ZCn-nN-DpK"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="top" secondItem="3RT-oa-JD2" secondAttribute="top" constant="67" id="ZyL-en-m44"/>
+                            <constraint firstItem="m5f-T0-hMu" firstAttribute="leading" secondItem="3RT-oa-JD2" secondAttribute="leading" id="jVx-9z-37z"/>
                             <constraint firstItem="eSs-pl-Aqj" firstAttribute="top" secondItem="vAL-g3-IXF" secondAttribute="bottom" constant="8" id="kza-A8-XrX"/>
                             <constraint firstItem="hA9-gh-esF" firstAttribute="trailing" secondItem="vAL-g3-IXF" secondAttribute="trailing" id="moE-uO-z45"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="top" secondItem="3RT-oa-JD2" secondAttribute="top" constant="67" id="oXJ-gZ-y3f"/>
+                            <constraint firstItem="3RT-oa-JD2" firstAttribute="bottom" secondItem="m5f-T0-hMu" secondAttribute="bottom" id="w08-MV-gUn"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="3RT-oa-JD2"/>
                     </view>
@@ -135,12 +142,13 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="mapView" destination="vAL-g3-IXF" id="0ZX-Da-PzP"/>
+                        <outlet property="newCollectionButton" destination="m5f-T0-hMu" id="7gj-Pu-orO"/>
                         <outlet property="okButton" destination="ty5-88-J0l" id="1p9-S0-8yp"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3gR-ke-kHI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3329" y="-186"/>
+            <point key="canvasLocation" x="3328.8000000000002" y="-186.65667166416793"/>
         </scene>
     </scenes>
 </document>
