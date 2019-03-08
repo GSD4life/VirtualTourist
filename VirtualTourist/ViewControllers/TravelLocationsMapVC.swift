@@ -27,7 +27,9 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "latitude", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor]
-        
+        if let result = try? dataController.viewContext.fetch(fetchRequest) {
+            pins = result
+        }
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         
@@ -62,6 +64,11 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        fetchedResultsController = nil
+    }
+    
     func savedMapRegion() {
         if !loadedSavedRegion {
             if let savedRegion = UserDefaults.standard.object(forKey: "savedMapRegion") as? [String: Double] {
@@ -73,10 +80,6 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         }
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        fetchedResultsController = nil
-    }
     
     func addGestureRecognizer() {
         let gestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(pressedLocation))
@@ -107,8 +110,6 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         mapView.frame.origin.y += deletePinsLabel.frame.height
         
     }
-    
-    
     
     
     fileprivate func loadPins() {
