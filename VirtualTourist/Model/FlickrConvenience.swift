@@ -29,7 +29,7 @@ extension FlickrClient {
             ] as [String:AnyObject]
         
         
-         _ = taskForGet(parameters: methodParameters) { (data, error) in
+        let _ = taskForGet(parameters: methodParameters) { (data, error) in
             func displayError(_ error: String) {
                 print(error)
             }

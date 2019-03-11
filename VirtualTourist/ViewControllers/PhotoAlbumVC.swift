@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 
 class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, MKMapViewDelegate {
-
+    
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var okButton: UIBarButtonItem!
     @IBOutlet weak var newCollectionButton: UIButton!
@@ -18,6 +18,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     var dataController: DataController!
     var coordinates = CLLocationCoordinate2D()
     var pin: Pin!
+    var URLArray = [URL]()
+    
     
     
     override func viewDidLoad() {
@@ -25,6 +27,15 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         mapView.delegate = self
         okButtonPressed(okButton)
         showMapItem()
+        FlickrClient.sharedInstance().getPhotos(coordinates.latitude, coordinates.longitude) { [unowned self] (success, arrayOfURLs, error) in
+            if success == true {
+                guard let arrayOfURLs = arrayOfURLs else { return }
+                for urls in arrayOfURLs {
+                    self.URLArray.append(urls)
+                    print(self.URLArray.count)
+                }
+            }
+        }
     }
     
     func showMapItem() {
@@ -51,24 +62,24 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
         
         if pinView == nil {
-        pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-        pinView!.animatesDrop = true
-        pinView!.pinTintColor = .red
-        
+            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.animatesDrop = true
+            pinView!.pinTintColor = .red
+            
         }
-        
+            
         else {
-        pinView!.annotation = annotation
-    }
+            pinView!.annotation = annotation
+        }
         return pinView!
-
+        
     }
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return section
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)

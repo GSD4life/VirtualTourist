@@ -42,11 +42,13 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        dataController = appDelegate.dataController
         mapView.delegate = self
         deletePinsLabel.isHidden = true
         
         addGestureRecognizer()
-        //setupFetchResultsController()
+        setupFetchResultsController()
         
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -149,7 +151,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
             
             
             mapView.addAnnotation(annotation)
-            //addPin(location: location)
+            addPin(location: location)
         }
     }
     
@@ -191,7 +193,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
                 "mapRegionSpanLonDelta": mapView.region.span.longitudeDelta
             ]
             
-            _ = UserDefaults.standard.set(regionToSave, forKey: "savedMapRegion")
+           let _ = UserDefaults.standard.set(regionToSave, forKey: "savedMapRegion")
             
         }
     }
@@ -200,13 +202,14 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         let destinationVC = segue.destination as! PhotoAlbumVC
         destinationVC.coordinates = mapCoordinates
         destinationVC.dataController = dataController
+        
     }
     
     
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         mapView.deselectAnnotation(view.annotation, animated: true)
-        _ = performSegue(withIdentifier: "PhotoAlbumVC", sender: self)
+        let _ = performSegue(withIdentifier: "PhotoAlbumVC", sender: self)
         
     }
     
