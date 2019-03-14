@@ -8,19 +8,22 @@
 
 import UIKit
 import MapKit
+import CoreData
 
-class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, MKMapViewDelegate {
+class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var okButton: UIBarButtonItem!
     @IBOutlet weak var newCollectionButton: UIButton!
+    @IBOutlet weak var collectionView: UICollectionView!
+    
     
     var dataController: DataController!
     var coordinates = CLLocationCoordinate2D()
     var pin: Pin!
     var URLArray = [URL]()
     
-    
+    var fetchedResultsController: NSFetchedResultsController<Photo>!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +40,12 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
             }
         }
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+    }
+    
     
     func showMapItem() {
         
@@ -75,9 +84,13 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
     }
     
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return fetchedResultsController.sections?.count ?? 0
+    }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return section
+        let sectionInfo = fetchedResultsController.sections![section]
+        return sectionInfo.numberOfObjects
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
