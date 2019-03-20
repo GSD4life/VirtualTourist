@@ -22,6 +22,12 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     var coordinates = CLLocationCoordinate2D()
     var pin: Pin!
     var URLArray = [URL]()
+    var selectedIndexes = [IndexPath]()
+    
+    // Keep the changes. We will keep track of insertions, deletions, and updates.
+    var insertedIndexPaths: [IndexPath]!
+    var deletedIndexPaths: [IndexPath]!
+    var updatedIndexPaths: [IndexPath]!
     
     var fetchedResultsController: NSFetchedResultsController<Photo>!
     
@@ -29,21 +35,41 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         super.viewDidLoad()
         mapView.delegate = self
         okButtonPressed(okButton)
+//        collectionView.dataSource = self 
+//        collectionView.delegate = self
         showMapItem()
+        getPhotoURLs()
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+    }
+    
+    
+    fileprivate func getPhotoURLs() {
         FlickrClient.sharedInstance().getPhotos(coordinates.latitude, coordinates.longitude) { [unowned self] (success, arrayOfURLs, error) in
             if success == true {
                 guard let arrayOfURLs = arrayOfURLs else { return }
                 for urls in arrayOfURLs {
+                    print(urls)
                     self.URLArray.append(urls)
                     print(self.URLArray.count)
+                }
+            } else {
+                if success == false {
+                    guard let error = error else { return }
+                    self.getPhotosURLAlertView(error.localizedDescription)
+                    
                 }
             }
         }
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
+    fileprivate func getPhotosURLAlertView(_ error: String?) {
+    let alertViewController = UIAlertController(title: "Download error", message: "The request most likely timed out", preferredStyle: .alert)
+    alertViewController.addAction(UIAlertAction(title: "Okay", style: .cancel, handler: nil))
+    present(alertViewController, animated: true, completion: nil)
     }
     
     
