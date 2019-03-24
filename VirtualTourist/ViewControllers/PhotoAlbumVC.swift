@@ -21,6 +21,9 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     var dataController: DataController!
     var coordinates = CLLocationCoordinate2D()
     var pin: Pin!
+    var photos: Photo!
+    var dataForPhotos = Data()
+    var images = UIImage()
     var URLArray = [URL]()
     var selectedIndexes = [IndexPath]()
     
@@ -35,12 +38,12 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         super.viewDidLoad()
         mapView.delegate = self
         okButtonPressed(okButton)
-//        collectionView.dataSource = self 
+//        collectionView.dataSource = self
 //        collectionView.delegate = self
         showMapItem()
         getPhotoURLs()
     }
-
+    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
@@ -51,8 +54,29 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         FlickrClient.sharedInstance().getPhotos(coordinates.latitude, coordinates.longitude) { [unowned self] (success, arrayOfURLs, error) in
             if success == true {
                 guard let arrayOfURLs = arrayOfURLs else { return }
-                for urls in arrayOfURLs {
-                    print(urls)
+                for urls in arrayOfURLs  {
+                    
+                    guard let photoData = try? Data(contentsOf: urls) else
+                    { print("unable to convert url to data")
+                    return }
+                    self.dataForPhotos = photoData
+                    //print(photoData)
+                    guard let photoImages = UIImage(data: photoData) else
+                    { print("can't convert data into a UIImage")
+                    return }
+                    self.images = photoImages
+                    //print(photoImages)
+                    let photosURL = urls
+                    let flickrPhoto = Photo(context: self.dataController.viewContext)
+                    flickrPhoto.image = photoData
+                    flickrPhoto.name = photosURL.absoluteString
+                    flickrPhoto.creationDate = Date()
+                    if self.dataController.viewContext.hasChanges {
+                        guard let _ = try? self.dataController.viewContext.save() else {
+                        print("unable to save")
+                        return
+                        }
+                    }
                     self.URLArray.append(urls)
                     print(self.URLArray.count)
                 }
@@ -67,9 +91,9 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     }
     
     fileprivate func getPhotosURLAlertView(_ error: String?) {
-    let alertViewController = UIAlertController(title: "Download error", message: "The request most likely timed out", preferredStyle: .alert)
-    alertViewController.addAction(UIAlertAction(title: "Okay", style: .cancel, handler: nil))
-    present(alertViewController, animated: true, completion: nil)
+        let alertViewController = UIAlertController(title: "Download Error", message: "The request most likely timed out.", preferredStyle: .alert)
+        alertViewController.addAction(UIAlertAction(title: "Okay", style: .cancel, handler: nil))
+        present(alertViewController, animated: true, completion: nil)
     }
     
     
@@ -123,6 +147,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
         return cell
+        
+        
     }
     
     
