@@ -25,6 +25,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     var dataForPhotos = Data()
     var images = UIImage()
     var URLArray = [URL]()
+    var managedObjectId: NSManagedObjectID?
     var selectedIndexes = [IndexPath]()
     
     // Keep the changes. We will keep track of insertions, deletions, and updates.
@@ -58,23 +59,24 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                     
                     guard let photoData = try? Data(contentsOf: urls) else
                     { print("unable to convert url to data")
-                    return }
+                        return }
                     self.dataForPhotos = photoData
                     //print(photoData)
                     guard let photoImages = UIImage(data: photoData) else
                     { print("can't convert data into a UIImage")
-                    return }
+                        return }
                     self.images = photoImages
                     //print(photoImages)
                     let photosURL = urls
                     let flickrPhoto = Photo(context: self.dataController.viewContext)
+                    self.managedObjectId = flickrPhoto.objectID
                     flickrPhoto.image = photoData
                     flickrPhoto.name = photosURL.absoluteString
                     flickrPhoto.creationDate = Date()
                     if self.dataController.viewContext.hasChanges {
                         guard let _ = try? self.dataController.viewContext.save() else {
-                        print("unable to save")
-                        return
+                            print("unable to save")
+                            return
                         }
                     }
                     self.URLArray.append(urls)
