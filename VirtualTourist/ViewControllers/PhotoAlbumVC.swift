@@ -39,15 +39,36 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         super.viewDidLoad()
         mapView.delegate = self
         okButtonPressed(okButton)
-//        collectionView.dataSource = self
-//        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.delegate = self
         showMapItem()
         getPhotoURLs()
+        setupFetchResultsController()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        fetchedResultsController = nil
         
+    }
+    
+    fileprivate func setupFetchResultsController() {
+        let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "location", ascending: true)
+        //let predicate = NSPredicate(format: "pin == %@", pin) - throws an error
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        if let result = try? dataController.viewContext.fetch(fetchRequest) {
+            print(result)
+        }
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController.delegate = self
+        
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            fatalError("The fetch request could not be performed: \(error.localizedDescription)")
+        }
+       //print(fetchedResultsController.fetchedObjects ?? 1)
     }
     
     
@@ -137,7 +158,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return fetchedResultsController.sections?.count ?? 0
+        return fetchedResultsController.sections?.count ?? 3
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -146,8 +167,15 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
+            as! PhotoCollectionViewCell
+        
+        
+        let aPhoto = fetchedResultsController.object(at: indexPath)
+        aPhoto.image = self.dataForPhotos
+        cell.virtualTouristImageView.image = self.images
+        
         return cell
         
         
