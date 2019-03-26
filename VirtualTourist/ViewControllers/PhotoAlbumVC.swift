@@ -21,7 +21,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     var dataController: DataController!
     var coordinates = CLLocationCoordinate2D()
     var pin: Pin!
-    var photos: Photo!
+    var photos: [Photo]!
     var dataForPhotos = Data()
     var images = UIImage()
     var URLArray = [URL]()
@@ -58,6 +58,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         //let predicate = NSPredicate(format: "pin == %@", pin) - throws an error
         fetchRequest.sortDescriptors = [sortDescriptor]
         if let result = try? dataController.viewContext.fetch(fetchRequest) {
+            photos = result
             print(result)
         }
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
