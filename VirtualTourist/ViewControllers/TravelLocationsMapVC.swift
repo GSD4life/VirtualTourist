@@ -16,6 +16,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     var fetchedResultsController: NSFetchedResultsController<Pin>!
     var loadedSavedRegion = false
     var pins: [Pin] = []
+    var photoImagePool: [Photo] = []
     var mapCoordinates = CLLocationCoordinate2D()
     
     

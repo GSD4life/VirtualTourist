@@ -76,6 +76,9 @@ extension FlickrClient {
         }
     }
     
+    func downloadImages(_ url: URL, completion: @escaping (_ data: Data?, _ error: Error?) -> Void) {
+        
+    }
     private func bboxString(_ latitude: Double, _ longitude: Double) -> String {
         // ensure bbox is bounded by minimum and maximums
         let minimumLon = max(longitude - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)

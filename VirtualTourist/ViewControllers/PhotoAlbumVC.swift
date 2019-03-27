@@ -59,7 +59,6 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         fetchRequest.sortDescriptors = [sortDescriptor]
         if let result = try? dataController.viewContext.fetch(fetchRequest) {
             photos = result
-            print(result)
         }
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
@@ -95,10 +94,15 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                     flickrPhoto.image = photoData
                     flickrPhoto.name = photosURL.absoluteString
                     flickrPhoto.creationDate = Date()
+                    flickrPhoto.pin = self.pin 
+                    self.photos.append(flickrPhoto)
                     if self.dataController.viewContext.hasChanges {
-                        guard let _ = try? self.dataController.viewContext.save() else {
-                            print("unable to save")
-                            return
+                        performUIUpdatesOnMain {
+                            guard let _ = try? self.dataController.viewContext.save() else {
+                                print("unable to save")
+                                self.collectionView.reloadData()
+                                return
+                            }
                         }
                     }
                     self.URLArray.append(urls)
@@ -169,7 +173,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCollectionViewCell", for: indexPath)
             as! PhotoCollectionViewCell
         
         
