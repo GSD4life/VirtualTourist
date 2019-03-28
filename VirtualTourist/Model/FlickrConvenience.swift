@@ -6,7 +6,7 @@
 //  Copyright © 2019 Shane Sealy. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 extension FlickrClient {
     
@@ -77,8 +77,33 @@ extension FlickrClient {
     }
     
     func downloadImages(_ url: URL, completion: @escaping (_ data: Data?, _ error: Error?) -> Void) {
+        let urlRequest = URLRequest(url: url)
         
+        func displayError(_ message: String) {
+            print(message)
+        }
+        
+        let session = URLSession.shared
+        let task = session.dataTask(with: urlRequest) { (data, response, error) in
+            
+            if let error = error {
+                displayError("The url request generated this error: \(error.localizedDescription)")
+            }
+            
+            guard data != nil else {
+                displayError("there was an error getting the data")
+                return
+            }
+            
+            guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else {
+                displayError("Your request returned a status code other than 2xx!")
+                return
+            }
+        }
+        
+        task.resume()
     }
+    
     private func bboxString(_ latitude: Double, _ longitude: Double) -> String {
         // ensure bbox is bounded by minimum and maximums
         let minimumLon = max(longitude - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)

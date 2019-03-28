@@ -94,6 +94,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                     flickrPhoto.image = photoData
                     flickrPhoto.name = photosURL.absoluteString
                     flickrPhoto.creationDate = Date()
+                    flickrPhoto.imageURL = photosURL.absoluteString
                     flickrPhoto.pin = self.pin 
                     self.photos.append(flickrPhoto)
                     if self.dataController.viewContext.hasChanges {
