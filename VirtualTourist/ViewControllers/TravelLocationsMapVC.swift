@@ -210,7 +210,14 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         mapView.deselectAnnotation(view.annotation, animated: true)
-        let _ = performSegue(withIdentifier: "PhotoAlbumVC", sender: self)
+        
+        guard let pinImage = view.annotation else { return }
+        
+        if editButton.title == "Done" {
+            mapView.removeAnnotation(pinImage)
+        } else {
+            let _ = performSegue(withIdentifier: "PhotoAlbumVC", sender: self)
+        }
         
     }
     
