@@ -16,12 +16,14 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     @IBOutlet weak var okButton: UIBarButtonItem!
     @IBOutlet weak var newCollectionButton: UIButton!
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
     
     var dataController: DataController!
     var coordinates = CLLocationCoordinate2D()
     var pin: Pin!
     var photos: [Photo]!
+    var photoURL: URL?
     var dataForPhotos = Data()
     var images = UIImage()
     var URLArray = [URL]()
@@ -38,6 +40,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self
+        flowLayoutSetup()
         okButtonPressed(okButton)
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -50,6 +53,16 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         super.viewDidDisappear(animated)
         fetchedResultsController = nil
         
+    }
+    
+    
+    fileprivate func flowLayoutSetup() {
+        let space: CGFloat = 2.0
+        let dimension = (view.frame.size.width - (2 * space)) / 2.0
+        
+        flowLayout.minimumInteritemSpacing = space
+        flowLayout.minimumLineSpacing = space
+        flowLayout.itemSize = CGSize(width: dimension, height: dimension)
     }
     
     fileprivate func setupFetchResultsController() {
@@ -68,7 +81,6 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         } catch {
             fatalError("The fetch request could not be performed: \(error.localizedDescription)")
         }
-       //print(fetchedResultsController.fetchedObjects ?? 1)
     }
     
     
@@ -81,13 +93,19 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                     guard let photoData = try? Data(contentsOf: urls) else
                     { print("unable to convert url to data")
                         return }
+                    
                     self.dataForPhotos = photoData
-                    //print(photoData)
+        
                     guard let photoImages = UIImage(data: photoData) else
                     { print("can't convert data into a UIImage")
                         return }
+                    
                     self.images = photoImages
-                    //print(photoImages)
+                
+                    
+                    self.photoURL = urls
+                    //self.testingFlickrDownload()
+                    
                     let photosURL = urls
                     let flickrPhoto = Photo(context: self.dataController.viewContext)
                     self.managedObjectId = flickrPhoto.objectID
@@ -101,9 +119,9 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                         performUIUpdatesOnMain {
                             guard let _ = try? self.dataController.viewContext.save() else {
                                 print("unable to save")
-                                self.collectionView.reloadData()
                                 return
                             }
+                            self.collectionView.reloadData()
                         }
                     }
                     self.URLArray.append(urls)
@@ -179,8 +197,10 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
         
         let aPhoto = fetchedResultsController.object(at: indexPath)
-        aPhoto.image = self.dataForPhotos
-        cell.virtualTouristImageView.image = self.images
+        aPhoto.image = dataForPhotos
+        aPhoto.imageURL = photoURL?.absoluteString
+        cell.virtualTouristImageView.image = images
+        
         
         return cell
         

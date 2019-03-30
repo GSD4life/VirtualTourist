@@ -151,6 +151,7 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="collectionView" destination="eSs-pl-Aqj" id="SJU-we-OO3"/>
+                        <outlet property="flowLayout" destination="JFV-u9-73u" id="jHq-Nk-KSV"/>
                         <outlet property="mapView" destination="vAL-g3-IXF" id="0ZX-Da-PzP"/>
                         <outlet property="newCollectionButton" destination="m5f-T0-hMu" id="7gj-Pu-orO"/>
                         <outlet property="okButton" destination="ty5-88-J0l" id="1p9-S0-8yp"/>

@@ -25,8 +25,8 @@ extension FlickrClient {
             Constants.FlickrParameterKeys.Latitude: latitude,
             Constants.FlickrParameterKeys.Longitude: longitude,
             Constants.FlickrParameterKeys.BoundingBox: bboxString(latitude, longitude),
-            Constants.FlickrParameterKeys.Page: Constants.FlickrParameterValues.ResponsePerPage
-            ] as [String:AnyObject]
+            Constants.FlickrParameterKeys.PhotosPerPage: Constants.FlickrParameterValues.ResponsePerPage
+        ] as [String:AnyObject]
         
         
         let _ = taskForGet(parameters: methodParameters) { (data, error) in
@@ -88,9 +88,12 @@ extension FlickrClient {
             
             if let error = error {
                 displayError("The url request generated this error: \(error.localizedDescription)")
+                completion(nil, error)
             }
             
-            guard data != nil else {
+           
+            
+            guard let data = data else {
                 displayError("there was an error getting the data")
                 return
             }
@@ -99,6 +102,8 @@ extension FlickrClient {
                 displayError("Your request returned a status code other than 2xx!")
                 return
             }
+            
+            completion(data, nil)
         }
         
         task.resume()
