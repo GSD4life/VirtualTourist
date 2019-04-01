@@ -194,7 +194,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
                 "mapRegionSpanLonDelta": mapView.region.span.longitudeDelta
             ]
             
-           let _ = UserDefaults.standard.set(regionToSave, forKey: "savedMapRegion")
+            let _ = UserDefaults.standard.set(regionToSave, forKey: "savedMapRegion")
             
         }
     }
@@ -204,6 +204,12 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         destinationVC.coordinates = mapCoordinates
         destinationVC.dataController = dataController
         
+    }
+    
+    func deletePin() {
+        for pinToDelete in fetchedResultsController.fetchedObjects ?? [] {
+            dataController.viewContext.delete(pinToDelete)
+        }
     }
     
     
