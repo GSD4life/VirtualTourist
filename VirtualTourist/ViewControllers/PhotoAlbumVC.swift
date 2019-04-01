@@ -22,7 +22,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     var dataController: DataController!
     var coordinates = CLLocationCoordinate2D()
     var pin: Pin!
-    var photos: [Photo]!
+    var photos: [Photo] = []
     var photoURL: URL?
     var dataForPhotos = Data()
     var images = UIImage()
@@ -57,11 +57,11 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     
     fileprivate func flowLayoutSetup() {
-        let space: CGFloat = 2.0
-        let dimension = (view.frame.size.width - (2 * space)) / 2.0
-        
+        let space: CGFloat = 0
+        let lineSpacing: CGFloat = 1
+        let dimension = (view.frame.size.width)/3
         flowLayout.minimumInteritemSpacing = space
-        flowLayout.minimumLineSpacing = space
+        flowLayout.minimumLineSpacing = lineSpacing
         flowLayout.itemSize = CGSize(width: dimension, height: dimension)
     }
     
