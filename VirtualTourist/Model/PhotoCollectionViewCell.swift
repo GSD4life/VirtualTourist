@@ -12,6 +12,7 @@ class PhotoCollectionViewCell: UICollectionViewCell {
     
     
     @IBOutlet weak var virtualTouristImageView: UIImageView!
+    @IBOutlet weak var activityViewIndicator: UIActivityIndicatorView!
     
     
 }

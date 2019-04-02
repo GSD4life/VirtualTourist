@@ -10,6 +10,9 @@ import UIKit
 
 class FlickrClient {
     
+    var imageString: URL?
+    var randomPageNumber: Int = 0
+    
     func taskForGet(parameters: [String:AnyObject], completionHandlerForGet: @escaping (_ success: AnyObject?, _ error: NSError?) -> Void) -> URLSessionDataTask {
         
         

@@ -67,7 +67,9 @@ extension FlickrClient {
                     guard let imageUrlString = URL(string: photo[Constants.FlickrResponseKeys.MediumURL] as? String ?? "No URL found") else {displayError("Cannot find key '\(Constants.FlickrResponseKeys.MediumURL)' in \(photo)")
                         return}
                     arrayOfURLs.append(imageUrlString)
+                    self.imageString = imageUrlString 
                     let randomPhotoIndex = Int(arc4random_uniform(UInt32(photosArray.count)))
+                    self.randomPageNumber = randomPhotoIndex
                     let _ = photosArray[randomPhotoIndex] as [String: AnyObject]
                     
                 }
@@ -86,12 +88,11 @@ extension FlickrClient {
         let session = URLSession.shared
         let task = session.dataTask(with: urlRequest) { (data, response, error) in
             
-            if let error = error {
-                displayError("The url request generated this error: \(error.localizedDescription)")
+            guard (error == nil) else {
+                displayError("The url request generated this error: \(error?.localizedDescription ?? "download image error")")
                 completion(nil, error)
+                return
             }
-            
-           
             
             guard let data = data else {
                 displayError("there was an error getting the data")

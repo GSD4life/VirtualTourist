@@ -103,9 +103,14 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="92" height="132"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="M26-Gm-0Xq">
+                                                    <rect key="frame" x="36" y="56" width="20" height="20"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </activityIndicatorView>
                                             </subviews>
                                         </view>
                                         <connections>
+                                            <outlet property="activityViewIndicator" destination="M26-Gm-0Xq" id="1me-o6-VsG"/>
                                             <outlet property="virtualTouristImageView" destination="ihX-LN-JUi" id="XDi-sd-7ZE"/>
                                         </connections>
                                     </collectionViewCell>
