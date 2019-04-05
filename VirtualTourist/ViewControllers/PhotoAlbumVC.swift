@@ -45,7 +45,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         collectionView.dataSource = self
         collectionView.delegate = self
         showMapItem()
-        getPhotoURLs()
+        loadImagesIfNoneAvailable()
         setupFetchResultsController()
     }
     
@@ -83,6 +83,12 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         }
     }
     
+    fileprivate func loadImagesIfNoneAvailable() {
+        
+        if photos.isEmpty {
+            getPhotoURLs()
+        }
+    }
     
     fileprivate func getPhotoURLs() {
         FlickrClient.sharedInstance().getPhotos(coordinates.latitude, coordinates.longitude) { [unowned self] (success, arrayOfURLs, error) in
@@ -153,6 +159,18 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     }
     
     
+    @IBAction func newCollectionButtonPressed(_ sender: UIBarButtonItem) {
+       
+        if photos.isEmpty {
+            newCollectionButton.isEnabled = false
+        } else {
+          photos = []
+          getPhotoURLs()
+          newCollectionButton.isEnabled = true
+        }
+    
+        
+    }
     
     @IBAction func okButtonPressed(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
@@ -202,9 +220,22 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         cell.virtualTouristImageView.image = images
         
         
+        
         return cell
         
         
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("didSelectItemAT function reached")
+        let flickrPhoto = fetchedResultsController.object(at: indexPath)
+        
+        
+        if newCollectionButton.isEnabled {
+            newCollectionButton.setTitle("Remove selected Image", for: .selected)
+            dataController.viewContext.delete(flickrPhoto)
+            guard let _ = try? dataController.viewContext.save() else { return }
+        }
     }
     
     

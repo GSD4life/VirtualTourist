@@ -25,7 +25,8 @@ extension FlickrClient {
             Constants.FlickrParameterKeys.Latitude: latitude,
             Constants.FlickrParameterKeys.Longitude: longitude,
             Constants.FlickrParameterKeys.BoundingBox: bboxString(latitude, longitude),
-            Constants.FlickrParameterKeys.PhotosPerPage: Constants.FlickrParameterValues.ResponsePerPage
+            Constants.FlickrParameterKeys.PhotosPerPage: Constants.FlickrParameterValues.ResponsePerPage,
+            Constants.FlickrParameterKeys.Page: randomPageNumber
         ] as [String:AnyObject]
         
         
