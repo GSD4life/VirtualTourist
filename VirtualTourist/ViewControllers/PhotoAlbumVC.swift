@@ -47,6 +47,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         showMapItem()
         loadImagesIfNoneAvailable()
         setupFetchResultsController()
+        
+        photos = fetchedResultsController.fetchedObjects ?? []
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -94,31 +96,13 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         FlickrClient.sharedInstance().getPhotos(coordinates.latitude, coordinates.longitude) { [unowned self] (success, arrayOfURLs, error) in
             if success == true {
                 guard let arrayOfURLs = arrayOfURLs else { return }
-                for urls in arrayOfURLs  {
+                for photoUrls in arrayOfURLs  {
                     
-                    guard let photoData = try? Data(contentsOf: urls) else
-                    { print("unable to convert url to data")
-                        return }
-                    
-                    self.dataForPhotos = photoData
-        
-                    guard let photoImages = UIImage(data: photoData) else
-                    { print("can't convert data into a UIImage")
-                        return }
-                    
-                    self.images = photoImages
-                
-                    
-                    self.photoURL = urls
-                    //self.testingFlickrDownload()
-                    
-                    let photosURL = urls
                     let flickrPhoto = Photo(context: self.dataController.viewContext)
                     self.managedObjectId = flickrPhoto.objectID
-                    flickrPhoto.image = photoData
-                    flickrPhoto.name = photosURL.absoluteString
+                    flickrPhoto.name = photoUrls.absoluteString
                     flickrPhoto.creationDate = Date()
-                    flickrPhoto.imageURL = photosURL.absoluteString
+                    flickrPhoto.imageURL = photoUrls.absoluteString
                     flickrPhoto.pin = self.pin 
                     self.photos.append(flickrPhoto)
                     if self.dataController.viewContext.hasChanges {
@@ -130,7 +114,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                             self.collectionView.reloadData()
                         }
                     }
-                    self.URLArray.append(urls)
+                    self.URLArray.append(photoUrls)
                     print(self.URLArray.count)
                 }
             } else {
@@ -160,17 +144,23 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     
     @IBAction func newCollectionButtonPressed(_ sender: UIBarButtonItem) {
-       
-        if photos.isEmpty {
-            newCollectionButton.isEnabled = false
-        } else {
-          photos = []
-          getPhotoURLs()
-          newCollectionButton.isEnabled = true
-        }
-    
         
+        if var fetchedPhotoArray = fetchedResultsController.fetchedObjects {
+            fetchedPhotoArray.forEach { (photo) in
+                photos.append(photo)
+            }
+            
+            if fetchedPhotoArray.isEmpty {
+                newCollectionButton.isEnabled = false
+            } else {
+                fetchedPhotoArray = []
+                getPhotoURLs()
+                newCollectionButton.isEnabled = true
+                
+            }
+        }
     }
+
     
     @IBAction func okButtonPressed(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
@@ -214,29 +204,47 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
             as! PhotoCollectionViewCell
         
         
-        let aPhoto = fetchedResultsController.object(at: indexPath)
-        aPhoto.image = dataForPhotos
-        aPhoto.imageURL = photoURL?.absoluteString
-        cell.virtualTouristImageView.image = images
+        let cellPhotoImage = fetchedResultsController.object(at: indexPath)
         
+        guard let cellURL = cellPhotoImage.imageURL else { return cell }
+        assert(cellURL == cellPhotoImage.imageURL, "CellURL error, line 209")
         
+        guard let url = URL(string: cellURL) else { return cell }
+        assert(url == URL(string: cellURL), "Url error within CellForItemAt, line 211")
         
+        performUIUpdatesOnMain {
+            cell.activityViewIndicator.startAnimating()
+            cell.activityViewIndicator.hidesWhenStopped = true
+        }
+
+        FlickrClient.sharedInstance().downloadImages(url) { [unowned self] (data, error) in
+            guard (error == nil) else { return }
+            assert(error == nil, "FlickrClient download images issue, line 220")
+            if let data = data {
+                performUIUpdatesOnMain {
+                    cellPhotoImage.image = data
+                    guard let cellImage = cellPhotoImage.image else { return }
+                    cellPhotoImage.pin = self.pin
+                    guard let _ = try? self.dataController.viewContext.save() else { return }
+                    cell.virtualTouristImageView.image = UIImage(data: cellImage)
+                    cell.setNeedsLayout()
+                    cell.activityViewIndicator.stopAnimating()
+                }
+            }
+        }
+
         return cell
-        
         
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("didSelectItemAT function reached")
+        
         let flickrPhoto = fetchedResultsController.object(at: indexPath)
+        dataController.viewContext.delete(flickrPhoto)
         
-        
-        if newCollectionButton.isEnabled {
-            newCollectionButton.setTitle("Remove selected Image", for: .selected)
-            dataController.viewContext.delete(flickrPhoto)
-            guard let _ = try? dataController.viewContext.save() else { return }
-        }
-    }
+    
+}
     
     
     
