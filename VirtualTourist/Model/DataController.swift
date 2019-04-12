@@ -26,7 +26,7 @@ class DataController {
             guard (error == nil) else {
                 fatalError(error?.localizedDescription ?? "There was an error loading the store")
             }
-            self.autoSaveViewContext()
+            //self.autoSaveViewContext()
             completion?()
         }
         

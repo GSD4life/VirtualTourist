@@ -48,7 +48,6 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         loadImagesIfNoneAvailable()
         setupFetchResultsController()
         
-        photos = fetchedResultsController.fetchedObjects ?? []
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -93,35 +92,37 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     }
     
     fileprivate func getPhotoURLs() {
-        FlickrClient.sharedInstance().getPhotos(coordinates.latitude, coordinates.longitude) { [unowned self] (success, arrayOfURLs, error) in
-            if success == true {
-                guard let arrayOfURLs = arrayOfURLs else { return }
-                for photoUrls in arrayOfURLs  {
-                    
-                    let flickrPhoto = Photo(context: self.dataController.viewContext)
-                    self.managedObjectId = flickrPhoto.objectID
-                    flickrPhoto.name = photoUrls.absoluteString
-                    flickrPhoto.creationDate = Date()
-                    flickrPhoto.imageURL = photoUrls.absoluteString
-                    flickrPhoto.pin = self.pin 
-                    self.photos.append(flickrPhoto)
-                    if self.dataController.viewContext.hasChanges {
+        DispatchQueue.global(qos: .background).async {
+            
+            FlickrClient.sharedInstance().getPhotos(self.coordinates.latitude, self.coordinates.longitude) { [unowned self] (success, arrayOfURLs, error) in
+                if success == true {
+                    guard let arrayOfURLs = arrayOfURLs else { return }
+                    for photoUrls in arrayOfURLs  {
+                        
                         performUIUpdatesOnMain {
-                            guard let _ = try? self.dataController.viewContext.save() else {
-                                print("unable to save")
-                                return
-                            }
+                            
+                            let flickrPhoto = Photo(context: self.dataController.viewContext)
+                            self.managedObjectId = flickrPhoto.objectID
+                            flickrPhoto.name = photoUrls.absoluteString
+                            flickrPhoto.creationDate = Date()
+                            flickrPhoto.imageURL = photoUrls.absoluteString
+                            flickrPhoto.pin = self.pin
+                            self.photos.append(flickrPhoto)
+                            
+                            
+                            self.saveChanges()
                             self.collectionView.reloadData()
                         }
+                        
+                        self.URLArray.append(photoUrls)
                     }
-                    self.URLArray.append(photoUrls)
                     print(self.URLArray.count)
-                }
-            } else {
-                if success == false {
-                    guard let error = error else { return }
-                    self.getPhotosURLAlertView(error.localizedDescription)
-                    
+                } else {
+                    if success == false {
+                        guard let error = error else { return }
+                        self.getPhotosURLAlertView(error.localizedDescription)
+                        
+                    }
                 }
             }
         }
@@ -133,6 +134,18 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         present(alertViewController, animated: true, completion: nil)
     }
     
+    func saveChanges() {
+        if dataController.viewContext.hasChanges {
+            guard let _ = try? dataController.viewContext.save() else {
+                print("unable to save")
+                return }
+        }
+    }
+    
+    func emptyArrays() {
+        URLArray = []
+        photos = []
+    }
     
     func showMapItem() {
         
@@ -145,22 +158,21 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     @IBAction func newCollectionButtonPressed(_ sender: UIBarButtonItem) {
         
-        if var fetchedPhotoArray = fetchedResultsController.fetchedObjects {
+        if let fetchedPhotoArray = fetchedResultsController.fetchedObjects {
             fetchedPhotoArray.forEach { (photo) in
-                photos.append(photo)
+                dataController.viewContext.delete(photo)
             }
             
             if fetchedPhotoArray.isEmpty {
                 newCollectionButton.isEnabled = false
             } else {
-                fetchedPhotoArray = []
+                emptyArrays()
                 getPhotoURLs()
                 newCollectionButton.isEnabled = true
                 
             }
         }
     }
-
     
     @IBAction func okButtonPressed(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
@@ -216,23 +228,26 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
             cell.activityViewIndicator.startAnimating()
             cell.activityViewIndicator.hidesWhenStopped = true
         }
-
-        FlickrClient.sharedInstance().downloadImages(url) { [unowned self] (data, error) in
-            guard (error == nil) else { return }
-            assert(error == nil, "FlickrClient download images issue, line 220")
-            if let data = data {
-                performUIUpdatesOnMain {
-                    cellPhotoImage.image = data
-                    guard let cellImage = cellPhotoImage.image else { return }
-                    cellPhotoImage.pin = self.pin
-                    guard let _ = try? self.dataController.viewContext.save() else { return }
-                    cell.virtualTouristImageView.image = UIImage(data: cellImage)
-                    cell.setNeedsLayout()
-                    cell.activityViewIndicator.stopAnimating()
+        
+        DispatchQueue.global(qos: .background).async {
+            
+            FlickrClient.sharedInstance().downloadImages(url) { [unowned self] (data, error) in
+                guard (error == nil) else { return }
+                assert(error == nil, "FlickrClient download images issue, line 220")
+                if let data = data {
+                    performUIUpdatesOnMain {
+                        cellPhotoImage.image = data
+                        guard let cellImage = cellPhotoImage.image else { return }
+                        cellPhotoImage.pin = self.pin
+                        guard let _ = try? self.dataController.viewContext.save() else { return }
+                        cell.virtualTouristImageView.image = UIImage(data: cellImage)
+                        cell.setNeedsLayout()
+                        cell.activityViewIndicator.stopAnimating()
+                    }
                 }
             }
         }
-
+        
         return cell
         
     }
@@ -243,8 +258,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         let flickrPhoto = fetchedResultsController.object(at: indexPath)
         dataController.viewContext.delete(flickrPhoto)
         
-    
-}
+        
+    }
     
     
     
