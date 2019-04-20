@@ -45,9 +45,14 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         collectionView.dataSource = self
         collectionView.delegate = self
         showMapItem()
-        loadImagesIfNoneAvailable()
+        //loadImagesIfNoneAvailable()
         setupFetchResultsController()
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        loadImagesIfNoneAvailable()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -69,7 +74,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     fileprivate func setupFetchResultsController() {
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "location", ascending: true)
-        //let predicate = NSPredicate(format: "pin == %@", pin) - throws an error
+        let predicate = NSPredicate(format: "pin == %@", pin)
+        fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = [sortDescriptor]
         if let result = try? dataController.viewContext.fetch(fetchRequest) {
             photos = result
@@ -86,46 +92,53 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     fileprivate func loadImagesIfNoneAvailable() {
         
-        if photos.isEmpty {
-            getPhotoURLs()
+        if let pinPhotos = pin.photos {
+            
+            if pinPhotos.count <= 0 {
+                print(pinPhotos.count)
+                self.getPhotoURLs()
+            }
+        
         }
     }
     
     fileprivate func getPhotoURLs() {
-        DispatchQueue.global(qos: .background).async {
+        
             
-            FlickrClient.sharedInstance().getPhotos(self.coordinates.latitude, self.coordinates.longitude) { [unowned self] (success, arrayOfURLs, error) in
+            FlickrClient.sharedInstance().getPhotos(self.pin.latitude, self.pin.longitude) { [weak self] (success, arrayOfURLs, error) in
                 if success == true {
                     guard let arrayOfURLs = arrayOfURLs else { return }
+                  
+                    performUIUpdatesOnMain {
+                
                     for photoUrls in arrayOfURLs  {
                         
-                        performUIUpdatesOnMain {
                             
-                            let flickrPhoto = Photo(context: self.dataController.viewContext)
-                            self.managedObjectId = flickrPhoto.objectID
+                        let flickrPhoto = Photo(context: (self?.dataController.viewContext)!)
+                            self?.managedObjectId = flickrPhoto.objectID
                             flickrPhoto.name = photoUrls.absoluteString
                             flickrPhoto.creationDate = Date()
                             flickrPhoto.imageURL = photoUrls.absoluteString
-                            flickrPhoto.pin = self.pin
-                            self.photos.append(flickrPhoto)
+                            flickrPhoto.pin = self?.pin
+                            self?.photos.append(flickrPhoto)
                             
                             
-                            self.saveChanges()
-                            self.collectionView.reloadData()
-                        }
+                            self?.saveChanges()
                         
-                        self.URLArray.append(photoUrls)
+                            self?.URLArray.append(photoUrls)
+                            print(self?.URLArray.count ?? 0)
+                       }
+                        
                     }
-                    print(self.URLArray.count)
+                    
                 } else {
                     if success == false {
                         guard let error = error else { return }
-                        self.getPhotosURLAlertView(error.localizedDescription)
+                        self?.getPhotosURLAlertView(error.localizedDescription)
                         
                     }
                 }
             }
-        }
     }
     
     fileprivate func getPhotosURLAlertView(_ error: String?) {
@@ -163,15 +176,10 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                 dataController.viewContext.delete(photo)
             }
             
-            if fetchedPhotoArray.isEmpty {
-                newCollectionButton.isEnabled = false
-            } else {
                 emptyArrays()
                 getPhotoURLs()
-                newCollectionButton.isEnabled = true
-                
+            
             }
-        }
     }
     
     @IBAction func okButtonPressed(_ sender: UIBarButtonItem) {
@@ -231,15 +239,15 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
         DispatchQueue.global(qos: .background).async {
             
-            FlickrClient.sharedInstance().downloadImages(url) { [unowned self] (data, error) in
+            FlickrClient.sharedInstance().downloadImages(url) { [weak self] (data, error) in
                 guard (error == nil) else { return }
                 assert(error == nil, "FlickrClient download images issue, line 220")
                 if let data = data {
                     performUIUpdatesOnMain {
                         cellPhotoImage.image = data
                         guard let cellImage = cellPhotoImage.image else { return }
-                        cellPhotoImage.pin = self.pin
-                        guard let _ = try? self.dataController.viewContext.save() else { return }
+                        cellPhotoImage.pin = self?.pin
+                        guard let _ = try? self?.dataController.viewContext.save() else { return }
                         cell.virtualTouristImageView.image = UIImage(data: cellImage)
                         cell.setNeedsLayout()
                         cell.activityViewIndicator.stopAnimating()
@@ -257,15 +265,59 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
         let flickrPhoto = fetchedResultsController.object(at: indexPath)
         dataController.viewContext.delete(flickrPhoto)
+
+    }
+    
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        print("controllerWillChangeContent reached")
+        insertedIndexPaths = [IndexPath]()
+        updatedIndexPaths = [IndexPath]()
+        deletedIndexPaths = [IndexPath]()
         
         
     }
     
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+        print("controller didChange anObject reached")
+        guard let newPath = newIndexPath else { return }
+        guard let path = indexPath else { return }
+        
+        switch type {
+        case .insert:
+            insertedIndexPaths.append(newPath)
+            break
+        case .delete:
+            deletedIndexPaths.append(path)
+            break
+        case .update:
+            updatedIndexPaths.append(path)
+            break
+        default:
+            break
+        }
+    }
     
-    
-    
-    
-    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        print("controllerDidChangeContent reached")
+        
+        collectionView.performBatchUpdates({ [unowned self] () -> Void in
+            
+            for indexPath in self.insertedIndexPaths {
+                self.collectionView.insertItems(at: [indexPath])
+            }
+            
+            for indexPath in self.deletedIndexPaths {
+                self.collectionView.deleteItems(at: [indexPath])
+            }
+            
+            for indexPath in self.updatedIndexPaths {
+                self.collectionView.reloadItems(at: [indexPath])
+            }
+        }, completion: nil)
+        
+    }
     
     
     

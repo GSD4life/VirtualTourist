@@ -16,6 +16,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     var fetchedResultsController: NSFetchedResultsController<Pin>!
     var loadedSavedRegion = false
     var pins: [Pin] = []
+    var pinObject: Pin!
     var photoImagePool: [Photo] = []
     var mapCoordinates = CLLocationCoordinate2D()
     
@@ -41,6 +42,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         }
         loadPins()
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
@@ -158,6 +160,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     
     func addPin(location: CLLocationCoordinate2D) {
         let pin = Pin(context: dataController.viewContext)
+        pinObject = pin
         pin.longitude = location.longitude
         pin.latitude = location.latitude
         pin.creationDate = Date()
@@ -203,7 +206,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         let destinationVC = segue.destination as! PhotoAlbumVC
         destinationVC.coordinates = mapCoordinates
         destinationVC.dataController = dataController
-        
+        destinationVC.pin = pinObject
     }
     
     func deletePin() {
