@@ -20,6 +20,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     
     var dataController: DataController!
+    var flickrPhotoId: NSManagedObjectID!
     var coordinates = CLLocationCoordinate2D()
     var pin: Pin!
     var photos: [Photo] = []
@@ -120,10 +121,12 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                             flickrPhoto.creationDate = Date()
                             flickrPhoto.imageURL = photoUrls.absoluteString
                             flickrPhoto.pin = self?.pin
+                            self?.flickrPhotoId = flickrPhoto.objectID
+                        
                             self?.photos.append(flickrPhoto)
                             
                             
-                            self?.saveChanges()
+                            self?.saveChangesViaBackground()
                         
                             self?.URLArray.append(photoUrls)
                             print(self?.URLArray.count ?? 0)
@@ -145,6 +148,19 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         let alertViewController = UIAlertController(title: "Download Error", message: "The request most likely timed out.", preferredStyle: .alert)
         alertViewController.addAction(UIAlertAction(title: "Okay", style: .cancel, handler: nil))
         present(alertViewController, animated: true, completion: nil)
+    }
+    
+    func saveChangesViaBackground() {
+        
+       // if dataController.backgroundContext.hasChanges {
+            dataController.backgroundContext.performAndWait {
+                let _ = self.dataController.backgroundContext.object(with: self.flickrPhotoId)
+                guard let _ = try? self.dataController.backgroundContext.save() else {
+                    print("unable to save")
+                    return
+             //   }
+            }
+        }
     }
     
     func saveChanges() {

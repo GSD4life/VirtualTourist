@@ -164,11 +164,21 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         pin.longitude = location.longitude
         pin.latitude = location.latitude
         pin.creationDate = Date()
-        do {
-            try dataController.viewContext.save()
-        } catch {
-            fatalError(error.localizedDescription)
+        let pinId = pin.objectID
+        
+        dataController.backgroundContext.performAndWait { [weak self] in
+            
+            let backgroundContext: NSManagedObjectContext! = self?.dataController?.backgroundContext
+            
+            guard let _ = backgroundContext.object(with: pinId) as? Pin else { return }
+            
+            do {
+                try self?.dataController.backgroundContext.save()
+            } catch {
+                fatalError(error.localizedDescription)
+            }
         }
+        
     }
     
     

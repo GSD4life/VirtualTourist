@@ -17,8 +17,20 @@ class DataController {
         return persistentContainer.viewContext
     }
     
+     let backgroundContext: NSManagedObjectContext!
+    
     init(modelName: String) {
         persistentContainer = NSPersistentContainer(name: modelName)
+        
+        backgroundContext = persistentContainer.newBackgroundContext()
+    }
+    
+    func configureContexts() {
+        viewContext.automaticallyMergesChangesFromParent = true
+//        backgroundContext.automaticallyMergesChangesFromParent = true
+        
+        backgroundContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+        viewContext.mergePolicy = NSMergePolicy.mergeByPropertyStoreTrump
     }
     
     func load(completion: (() -> Void)? = nil)  {
@@ -27,6 +39,7 @@ class DataController {
                 fatalError(error?.localizedDescription ?? "There was an error loading the store")
             }
             //self.autoSaveViewContext()
+            self.configureContexts()
             completion?()
         }
         
