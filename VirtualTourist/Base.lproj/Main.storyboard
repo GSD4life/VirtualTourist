@@ -131,13 +131,13 @@
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DHe-b0-dLJ">
                                 <rect key="frame" x="0.0" y="623" width="375" height="44"/>
                                 <items>
-                                    <barButtonItem width="61" style="plain" systemItem="fixedSpace" id="c62-OY-6sU"/>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="Gdp-XD-hlX"/>
                                     <barButtonItem title="item" id="5t9-qG-BF9">
                                         <connections>
                                             <action selector="newCollectionButtonPressed:" destination="GZa-pb-wjp" id="SsD-Ym-YLl"/>
                                         </connections>
                                     </barButtonItem>
-                                    <barButtonItem width="42" style="plain" systemItem="fixedSpace" id="EeN-Ms-O9f"/>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="nnp-rG-ZiJ"/>
                                 </items>
                             </toolbar>
                         </subviews>
