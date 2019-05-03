@@ -14,7 +14,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var okButton: UIBarButtonItem!
-    @IBOutlet weak var newCollectionButton: UIButton!
+    @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
@@ -48,6 +48,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         showMapItem()
         //loadImagesIfNoneAvailable()
         setupFetchResultsController()
+        
+        updateBottomButton()
         
     }
     
@@ -94,73 +96,60 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     fileprivate func loadImagesIfNoneAvailable() {
         
         if let pinPhotos = pin.photos {
-            
             if pinPhotos.count <= 0 {
-                print(pinPhotos.count)
-                self.getPhotoURLs()
+                getPhotoURLs()
+                
             }
-        
+            
         }
     }
     
     fileprivate func getPhotoURLs() {
         
-            
-            FlickrClient.sharedInstance().getPhotos(self.pin.latitude, self.pin.longitude) { [weak self] (success, arrayOfURLs, error) in
-                if success == true {
-                    guard let arrayOfURLs = arrayOfURLs else { return }
-                  
-                    performUIUpdatesOnMain {
+        
+        FlickrClient.sharedInstance().getPhotos(self.pin.latitude, self.pin.longitude) { [weak self] (success, arrayOfURLs, error) in
+            if success == true {
+                guard let arrayOfURLs = arrayOfURLs else { return }
                 
+                performUIUpdatesOnMain {
+                    
                     for photoUrls in arrayOfURLs  {
                         
-                            
+                        
                         let flickrPhoto = Photo(context: (self?.dataController.viewContext)!)
-                            self?.managedObjectId = flickrPhoto.objectID
-                            flickrPhoto.name = photoUrls.absoluteString
-                            flickrPhoto.creationDate = Date()
-                            flickrPhoto.imageURL = photoUrls.absoluteString
-                            flickrPhoto.pin = self?.pin
-                            self?.flickrPhotoId = flickrPhoto.objectID
+                        self?.managedObjectId = flickrPhoto.objectID
+                        flickrPhoto.name = photoUrls.absoluteString
+                        flickrPhoto.creationDate = Date()
+                        flickrPhoto.imageURL = photoUrls.absoluteString
+                        flickrPhoto.pin = self?.pin
                         
-                            self?.photos.append(flickrPhoto)
-                            
-                            
-                            self?.saveChangesViaBackground()
+                        self?.flickrPhotoId = flickrPhoto.objectID
                         
-                            self?.URLArray.append(photoUrls)
-                            print(self?.URLArray.count ?? 0)
-                       }
+                        self?.photos.append(flickrPhoto)
                         
+                        
+                        self?.saveChanges()
+                        
+                        self?.URLArray.append(photoUrls)
+                        print(self?.URLArray.count ?? 0)
                     }
                     
-                } else {
-                    if success == false {
-                        guard let error = error else { return }
-                        self?.getPhotosURLAlertView(error.localizedDescription)
-                        
-                    }
+                }
+                
+            } else {
+                if success == false {
+                    guard let error = error else { return }
+                    self?.getPhotosURLAlertView(error.localizedDescription)
+                    
                 }
             }
+        }
     }
     
     fileprivate func getPhotosURLAlertView(_ error: String?) {
         let alertViewController = UIAlertController(title: "Download Error", message: "The request most likely timed out.", preferredStyle: .alert)
         alertViewController.addAction(UIAlertAction(title: "Okay", style: .cancel, handler: nil))
         present(alertViewController, animated: true, completion: nil)
-    }
-    
-    func saveChangesViaBackground() {
-        
-       // if dataController.backgroundContext.hasChanges {
-            dataController.backgroundContext.performAndWait {
-                let _ = self.dataController.backgroundContext.object(with: self.flickrPhotoId)
-                guard let _ = try? self.dataController.backgroundContext.save() else {
-                    print("unable to save")
-                    return
-             //   }
-            }
-        }
     }
     
     func saveChanges() {
@@ -187,15 +176,13 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     @IBAction func newCollectionButtonPressed(_ sender: UIBarButtonItem) {
         
-        if let fetchedPhotoArray = fetchedResultsController.fetchedObjects {
-            fetchedPhotoArray.forEach { (photo) in
-                dataController.viewContext.delete(photo)
-            }
-            
-                emptyArrays()
-                getPhotoURLs()
-            
-            }
+        guard let pinImages = pin.photos else { return }
+        if pinImages.count <= 0 {
+           deleteAllPhotos()
+        } else {
+            emptyArrays()
+            getPhotoURLs()
+        }
     }
     
     @IBAction func okButtonPressed(_ sender: UIBarButtonItem) {
@@ -203,6 +190,42 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     }
     
     
+    func deleteAllPhotos() {
+        
+        if let fetchedPhotoArray = fetchedResultsController.fetchedObjects {
+            
+            fetchedPhotoArray.forEach { (photo) in
+                dataController.viewContext.delete(photo)
+            }
+            
+        }
+    }
+    
+    
+    func deleteSelectedPhoto() {
+        var photosToDelete = fetchedResultsController.fetchedObjects ?? []
+        
+        for indexPath in selectedIndexes {
+            photosToDelete.append(fetchedResultsController.object(at: indexPath) )
+        }
+        
+        for photo in photosToDelete {
+            dataController.viewContext.delete(photo)
+        }
+        
+        selectedIndexes = [IndexPath]()
+    }
+    
+    func updateBottomButton() {
+        
+        guard let pinImages = pin.photos else { return }
+        
+        if pinImages.count > 0 {
+            newCollectionButton.title = "Remove Selected Pictures"
+        } else {
+            newCollectionButton.title = "New Collection"
+        }
+    }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
@@ -225,12 +248,28 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
     }
     
+    func configureCell(_ cell: PhotoCollectionViewCell, atIndexPath indexPath: IndexPath) {
+        
+        // let photo = fetchedResultsController.object(at: indexPath)
+        
+        if let _ = selectedIndexes.firstIndex(of: indexPath) {
+            cell.backgroundColor = .white
+            cell.virtualTouristImageView.alpha = 0.5
+        } else {
+            cell.backgroundColor = .white
+            cell.virtualTouristImageView.alpha = 1.0
+        }
+    }
+    
+    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return fetchedResultsController.sections?.count ?? 3
+        return fetchedResultsController.sections?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = fetchedResultsController.sections![section]
+        
+        print("number of sections: \(sectionInfo.numberOfObjects)")
         return sectionInfo.numberOfObjects
     }
     
@@ -238,6 +277,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCollectionViewCell", for: indexPath)
             as! PhotoCollectionViewCell
+        
+        configureCell(cell, atIndexPath: indexPath)
         
         
         let cellPhotoImage = fetchedResultsController.object(at: indexPath)
@@ -279,9 +320,14 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("didSelectItemAT function reached")
         
-        let flickrPhoto = fetchedResultsController.object(at: indexPath)
-        dataController.viewContext.delete(flickrPhoto)
-
+        guard let cell = collectionView.cellForItem(at: indexPath) as? PhotoCollectionViewCell else { return }
+        
+        deleteSelectedPhoto()
+        
+        configureCell(cell, atIndexPath: indexPath)
+        
+        updateBottomButton()
+        
     }
     
     
@@ -315,6 +361,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         }
     }
     
+    /*- causes collectionView cells to constantly update?
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("controllerDidChangeContent reached")
         
@@ -331,9 +378,9 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
             for indexPath in self.updatedIndexPaths {
                 self.collectionView.reloadItems(at: [indexPath])
             }
-        }, completion: nil)
+            }, completion: nil)
         
-    }
+    } */
     
     
     

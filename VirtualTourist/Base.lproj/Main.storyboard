@@ -83,7 +83,7 @@
                                 </constraints>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="eSs-pl-Aqj">
-                                <rect key="frame" x="0.0" y="182" width="375" height="357"/>
+                                <rect key="frame" x="0.0" y="182" width="375" height="441"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="JFV-u9-73u">
                                     <size key="itemSize" width="92" height="132"/>
@@ -128,30 +128,35 @@
                                     </navigationItem>
                                 </items>
                             </navigationBar>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="m5f-T0-hMu">
-                                <rect key="frame" x="0.0" y="593" width="375" height="30"/>
-                                <state key="normal" title="New Collection"/>
-                                <connections>
-                                    <action selector="newCollectionButtonPressed:" destination="GZa-pb-wjp" eventType="touchUpInside" id="WDc-IB-Rjo"/>
-                                </connections>
-                            </button>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DHe-b0-dLJ">
+                                <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                                <items>
+                                    <barButtonItem width="61" style="plain" systemItem="fixedSpace" id="c62-OY-6sU"/>
+                                    <barButtonItem title="item" id="5t9-qG-BF9">
+                                        <connections>
+                                            <action selector="newCollectionButtonPressed:" destination="GZa-pb-wjp" id="SsD-Ym-YLl"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem width="42" style="plain" systemItem="fixedSpace" id="EeN-Ms-O9f"/>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="3RT-oa-JD2" firstAttribute="bottom" secondItem="eSs-pl-Aqj" secondAttribute="bottom" constant="84" id="1j7-ih-03a"/>
+                            <constraint firstAttribute="bottom" secondItem="DHe-b0-dLJ" secondAttribute="bottom" id="1Av-fq-zcN"/>
+                            <constraint firstItem="3RT-oa-JD2" firstAttribute="bottom" secondItem="eSs-pl-Aqj" secondAttribute="bottom" id="1j7-ih-03a"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="trailing" secondItem="eSs-pl-Aqj" secondAttribute="trailing" id="3mR-l4-W4R"/>
-                            <constraint firstItem="3RT-oa-JD2" firstAttribute="trailing" secondItem="m5f-T0-hMu" secondAttribute="trailing" id="Cxq-TG-eGo"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="top" secondItem="hA9-gh-esF" secondAttribute="bottom" id="Fx0-ux-gqw"/>
                             <constraint firstItem="eSs-pl-Aqj" firstAttribute="leading" secondItem="3RT-oa-JD2" secondAttribute="leading" id="JCz-Rj-aaS"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="leading" secondItem="eSs-pl-Aqj" secondAttribute="leading" id="NpJ-iY-hhZ"/>
                             <constraint firstItem="3RT-oa-JD2" firstAttribute="trailing" secondItem="eSs-pl-Aqj" secondAttribute="trailing" id="TGm-i2-GQj"/>
                             <constraint firstItem="hA9-gh-esF" firstAttribute="leading" secondItem="vAL-g3-IXF" secondAttribute="leading" id="ZCn-nN-DpK"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="top" secondItem="3RT-oa-JD2" secondAttribute="top" constant="67" id="ZyL-en-m44"/>
-                            <constraint firstItem="m5f-T0-hMu" firstAttribute="leading" secondItem="3RT-oa-JD2" secondAttribute="leading" id="jVx-9z-37z"/>
                             <constraint firstItem="eSs-pl-Aqj" firstAttribute="top" secondItem="vAL-g3-IXF" secondAttribute="bottom" constant="8" id="kza-A8-XrX"/>
                             <constraint firstItem="hA9-gh-esF" firstAttribute="trailing" secondItem="vAL-g3-IXF" secondAttribute="trailing" id="moE-uO-z45"/>
                             <constraint firstItem="vAL-g3-IXF" firstAttribute="top" secondItem="3RT-oa-JD2" secondAttribute="top" constant="67" id="oXJ-gZ-y3f"/>
-                            <constraint firstItem="3RT-oa-JD2" firstAttribute="bottom" secondItem="m5f-T0-hMu" secondAttribute="bottom" id="w08-MV-gUn"/>
+                            <constraint firstItem="DHe-b0-dLJ" firstAttribute="leading" secondItem="0k3-A0-aEf" secondAttribute="leading" id="p0m-B0-Y5U"/>
+                            <constraint firstAttribute="trailing" secondItem="DHe-b0-dLJ" secondAttribute="trailing" id="ri0-xi-H0L"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="3RT-oa-JD2"/>
                     </view>
@@ -161,7 +166,7 @@
                         <outlet property="collectionView" destination="eSs-pl-Aqj" id="SJU-we-OO3"/>
                         <outlet property="flowLayout" destination="JFV-u9-73u" id="jHq-Nk-KSV"/>
                         <outlet property="mapView" destination="vAL-g3-IXF" id="0ZX-Da-PzP"/>
-                        <outlet property="newCollectionButton" destination="m5f-T0-hMu" id="7gj-Pu-orO"/>
+                        <outlet property="newCollectionButton" destination="5t9-qG-BF9" id="knO-8h-6Ar"/>
                         <outlet property="okButton" destination="ty5-88-J0l" id="1p9-S0-8yp"/>
                     </connections>
                 </viewController>

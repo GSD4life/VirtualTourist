@@ -30,7 +30,7 @@ extension FlickrClient {
         ] as [String:AnyObject]
         
         
-        let _ = taskForGet(parameters: methodParameters) { (data, error) in
+        let _ = taskForGet(parameters: methodParameters) { [weak self] (data, error) in
             func displayError(_ error: String) {
                 print(error)
             }
@@ -53,8 +53,8 @@ extension FlickrClient {
                     return
                 }
                 
-                
-                guard let totalPages = photosDictionary[Constants.FlickrResponseKeys.Pages] as? Int else {
+                // replaced totalPages with _
+                guard let _ = photosDictionary[Constants.FlickrResponseKeys.Pages] as? Int else {
                     displayError("Cannot find key '\(Constants.FlickrResponseKeys.Pages)' in \(photosDictionary)")
                     return
                 }
@@ -68,9 +68,9 @@ extension FlickrClient {
                     guard let imageUrlString = URL(string: photo[Constants.FlickrResponseKeys.MediumURL] as? String ?? "No URL found") else {displayError("Cannot find key '\(Constants.FlickrResponseKeys.MediumURL)' in \(photo)")
                         return}
                     arrayOfURLs.append(imageUrlString)
-                    self.imageString = imageUrlString 
+                    self?.imageString = imageUrlString
                     let randomPhotoIndex = Int(arc4random_uniform(UInt32(photosArray.count)))
-                    self.randomPageNumber = randomPhotoIndex
+                    self?.randomPageNumber = randomPhotoIndex
                     let _ = photosArray[randomPhotoIndex] as [String: AnyObject]
                     
                 }

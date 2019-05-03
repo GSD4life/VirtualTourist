@@ -164,20 +164,9 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         pin.longitude = location.longitude
         pin.latitude = location.latitude
         pin.creationDate = Date()
-        let pinId = pin.objectID
+       // let pinId = pin.objectID
         
-        dataController.backgroundContext.performAndWait { [weak self] in
-            
-            let backgroundContext: NSManagedObjectContext! = self?.dataController?.backgroundContext
-            
-            guard let _ = backgroundContext.object(with: pinId) as? Pin else { return }
-            
-            do {
-                try self?.dataController.backgroundContext.save()
-            } catch {
-                fatalError(error.localizedDescription)
-            }
-        }
+        guard let _ = try? dataController.viewContext.save() else { return }
         
     }
     
@@ -217,15 +206,8 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         destinationVC.coordinates = mapCoordinates
         destinationVC.dataController = dataController
         destinationVC.pin = pinObject
+        destinationVC.pin.photos = pinObject.photos
     }
-    
-    func deletePin() {
-        for pinToDelete in fetchedResultsController.fetchedObjects ?? [] {
-            dataController.viewContext.delete(pinToDelete)
-        }
-    }
-    
-    
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         mapView.deselectAnnotation(view.annotation, animated: true)
