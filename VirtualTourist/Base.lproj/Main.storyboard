@@ -91,6 +91,13 @@
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
+                                <label key="backgroundView" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="4oj-7D-pTx">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="441"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <nil key="textColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="PhotoCollectionViewCell" id="Sm0-AH-6JI" customClass="PhotoCollectionViewCell" customModule="VirtualTourist" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="92" height="132"/>
@@ -167,6 +174,7 @@
                         <outlet property="flowLayout" destination="JFV-u9-73u" id="jHq-Nk-KSV"/>
                         <outlet property="mapView" destination="vAL-g3-IXF" id="0ZX-Da-PzP"/>
                         <outlet property="newCollectionButton" destination="5t9-qG-BF9" id="knO-8h-6Ar"/>
+                        <outlet property="noImagesLabel" destination="4oj-7D-pTx" id="kBQ-Ok-Wff"/>
                         <outlet property="okButton" destination="ty5-88-J0l" id="1p9-S0-8yp"/>
                     </connections>
                 </viewController>

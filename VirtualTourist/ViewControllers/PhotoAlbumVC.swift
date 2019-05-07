@@ -17,7 +17,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
-    
+    @IBOutlet weak var noImagesLabel: UILabel!
     
     var dataController: DataController!
     var flickrPhotoId: NSManagedObjectID!
@@ -46,7 +46,6 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         collectionView.dataSource = self
         collectionView.delegate = self
         showMapItem()
-        //loadImagesIfNoneAvailable()
         setupFetchResultsController()
         
         updateBottomButton()
@@ -97,6 +96,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
         if let pinPhotos = pin.photos {
             if pinPhotos.count <= 0 {
+                newCollectionButton.isEnabled = false
+                noImagesLabelSetup()
                 getPhotoURLs()
                 
             }
@@ -181,12 +182,30 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
            deleteAllPhotos()
         } else {
             emptyArrays()
+            deleteSelectedPhoto()
             getPhotoURLs()
         }
     }
     
     @IBAction func okButtonPressed(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
+    }
+    
+    func noImagesLabelSetup() {
+        performUIUpdatesOnMain { [weak self] in
+            
+            guard let pinPhotos = self?.pin.photos?.count else { return }
+            
+            if pinPhotos == 0 {
+                self?.noImagesLabel.isHidden = false
+                self?.noImagesLabel.textAlignment = .center
+                self?.noImagesLabel.text = "This pin has no images"
+                
+            } else {
+                self?.noImagesLabel.isHidden = true
+            }
+        }
+        
     }
     
     
@@ -196,7 +215,9 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
             
             fetchedPhotoArray.forEach { (photo) in
                 dataController.viewContext.delete(photo)
+                saveChanges()
             }
+            
             
         }
     }
@@ -211,6 +232,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
         for photo in photosToDelete {
             dataController.viewContext.delete(photo)
+            saveChanges()
         }
         
         selectedIndexes = [IndexPath]()
@@ -218,10 +240,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     func updateBottomButton() {
         
-        guard let pinImages = pin.photos else { return }
-        
-        if pinImages.count > 0 {
-            newCollectionButton.title = "Remove Selected Pictures"
+        if selectedIndexes.count > 0 {
+            newCollectionButton.title = "Remove Selected Picture"
         } else {
             newCollectionButton.title = "New Collection"
         }
@@ -322,11 +342,20 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
         guard let cell = collectionView.cellForItem(at: indexPath) as? PhotoCollectionViewCell else { return }
         
-        deleteSelectedPhoto()
+            // Whenever a cell is tapped we will toggle its presence in the selectedIndexes array
+            if let index = selectedIndexes.firstIndex(of: indexPath) {
+                print("selected index reached")
+                selectedIndexes.remove(at: index)
+                deleteSelectedPhoto()
+                print("selected index removed")
+            } else {
+                selectedIndexes.append(indexPath)
+            }
         
-        configureCell(cell, atIndexPath: indexPath)
+            configureCell(cell, atIndexPath: indexPath)
+            
+            updateBottomButton()
         
-        updateBottomButton()
         
     }
     
@@ -361,7 +390,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         }
     }
     
-    /*- causes collectionView cells to constantly update?
+//    - Causes collectionView cells to constantly update and blocks CollectionView delegate didSelectItemAt ?
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("controllerDidChangeContent reached")
         
@@ -375,12 +404,15 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                 self.collectionView.deleteItems(at: [indexPath])
             }
             
+             //  this blocks the UI and affects didSelectItemAt
+             //  as newCollectionButton title does not update to "Remove Selected Picture"
             for indexPath in self.updatedIndexPaths {
                 self.collectionView.reloadItems(at: [indexPath])
             }
+            
             }, completion: nil)
         
-    } */
+    }
     
     
     

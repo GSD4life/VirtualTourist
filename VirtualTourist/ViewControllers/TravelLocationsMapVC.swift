@@ -161,6 +161,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
     func addPin(location: CLLocationCoordinate2D) {
         let pin = Pin(context: dataController.viewContext)
         pinObject = pin
+        pinObject.photos = pin.photos
         pin.longitude = location.longitude
         pin.latitude = location.latitude
         pin.creationDate = Date()
@@ -207,6 +208,7 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         destinationVC.dataController = dataController
         destinationVC.pin = pinObject
         destinationVC.pin.photos = pinObject.photos
+        
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
