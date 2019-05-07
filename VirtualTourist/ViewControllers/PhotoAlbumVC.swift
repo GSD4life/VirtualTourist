@@ -97,9 +97,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         if let pinPhotos = pin.photos {
             if pinPhotos.count <= 0 {
                 newCollectionButton.isEnabled = false
-                noImagesLabelSetup()
+                //noImagesLabelSetup()
                 getPhotoURLs()
-                
             }
             
         }
@@ -134,7 +133,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                         self?.URLArray.append(photoUrls)
                         print(self?.URLArray.count ?? 0)
                     }
-                    
+                        self?.collectionView.reloadData()
                 }
                 
             } else {
@@ -295,6 +294,8 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
+        print("cellForItemAt called")
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCollectionViewCell", for: indexPath)
             as! PhotoCollectionViewCell
         
@@ -390,7 +391,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         }
     }
     
-//    - Causes collectionView cells to constantly update and blocks CollectionView delegate didSelectItemAt ?
+//  Causes collectionView cells to constantly update and blocks CollectionView delegate didSelectItemAt ?
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("controllerDidChangeContent reached")
         
@@ -404,11 +405,11 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                 self.collectionView.deleteItems(at: [indexPath])
             }
             
-             //  this blocks the UI and affects didSelectItemAt
+             /*  this blocks the UI and affects didSelectItemAt - removed per mentor
              //  as newCollectionButton title does not update to "Remove Selected Picture"
-            for indexPath in self.updatedIndexPaths {
-                self.collectionView.reloadItems(at: [indexPath])
-            }
+           for indexPath in self.updatedIndexPaths {
+               self.collectionView.reloadItems(at: [indexPath])
+           } */
             
             }, completion: nil)
         
