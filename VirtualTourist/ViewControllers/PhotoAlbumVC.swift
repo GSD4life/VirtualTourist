@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
+class PhotoAlbumVC: UIViewController, MKMapViewDelegate {
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var okButton: UIBarButtonItem!
@@ -47,14 +47,14 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         collectionView.delegate = self
         showMapItem()
         setupFetchResultsController()
-        
+        getPhotoURLs()
         updateBottomButton()
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadImagesIfNoneAvailable()
+        //loadImagesIfNoneAvailable()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -133,7 +133,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                         self?.URLArray.append(photoUrls)
                         print(self?.URLArray.count ?? 0)
                     }
-                        self?.collectionView.reloadData()
+                    self?.collectionView.reloadData()
                 }
                 
             } else {
@@ -178,7 +178,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
         guard let pinImages = pin.photos else { return }
         if pinImages.count <= 0 {
-           deleteAllPhotos()
+            deleteAllPhotos()
         } else {
             emptyArrays()
             deleteSelectedPhoto()
@@ -280,6 +280,9 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         }
     }
     
+}
+
+extension PhotoAlbumVC: UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return fetchedResultsController.sections?.count ?? 0
@@ -337,29 +340,33 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         return cell
         
     }
+}
+
+extension PhotoAlbumVC: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("didSelectItemAT function reached")
         
         guard let cell = collectionView.cellForItem(at: indexPath) as? PhotoCollectionViewCell else { return }
         
-            // Whenever a cell is tapped we will toggle its presence in the selectedIndexes array
-            if let index = selectedIndexes.firstIndex(of: indexPath) {
-                print("selected index reached")
-                selectedIndexes.remove(at: index)
-                deleteSelectedPhoto()
-                print("selected index removed")
-            } else {
-                selectedIndexes.append(indexPath)
-            }
+        // Whenever a cell is tapped we will toggle its presence in the selectedIndexes array
+        if let index = selectedIndexes.firstIndex(of: indexPath) {
+            print("selected index reached")
+            selectedIndexes.remove(at: index)
+            deleteSelectedPhoto()
+            print("selected index removed")
+        } else {
+            selectedIndexes.append(indexPath)
+        }
         
-            configureCell(cell, atIndexPath: indexPath)
-            
-            updateBottomButton()
+        configureCell(cell, atIndexPath: indexPath)
         
+        updateBottomButton()
         
     }
-    
+}
+
+extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("controllerWillChangeContent reached")
@@ -391,7 +398,7 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         }
     }
     
-//  Causes collectionView cells to constantly update and blocks CollectionView delegate didSelectItemAt ?
+    //  Causes collectionView cells to constantly update and blocks CollectionView delegate didSelectItemAt ?
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("controllerDidChangeContent reached")
         
@@ -405,17 +412,14 @@ class PhotoAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                 self.collectionView.deleteItems(at: [indexPath])
             }
             
-             /*  this blocks the UI and affects didSelectItemAt - removed per mentor
+            /*  this blocks the UI and affects didSelectItemAt - removed per mentor
              //  as newCollectionButton title does not update to "Remove Selected Picture"
-           for indexPath in self.updatedIndexPaths {
-               self.collectionView.reloadItems(at: [indexPath])
-           } */
+             for indexPath in self.updatedIndexPaths {
+             self.collectionView.reloadItems(at: [indexPath])
+             } */
             
             }, completion: nil)
         
     }
-    
-    
-    
     
 }
