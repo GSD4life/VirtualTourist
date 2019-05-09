@@ -46,19 +46,11 @@ extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
         
         collectionView.performBatchUpdates({ [unowned self] () -> Void in
             
-            for indexPath in self.insertedIndexPaths {
-                self.collectionView.insertItems(at: [indexPath])
-            }
+            self.collectionView.insertItems(at: insertedIndexPaths)
             
-            for indexPath in self.deletedIndexPaths {
-                self.collectionView.deleteItems(at: [indexPath])
-            }
+            self.collectionView.deleteItems(at: deletedIndexPaths)
             
-            /*  this blocks the UI and affects didSelectItemAt - removed per mentor
-             //  as newCollectionButton title does not update to "Remove Selected Picture"
-             for indexPath in self.updatedIndexPaths {
-             self.collectionView.reloadItems(at: [indexPath])
-             } */
+            self.collectionView.reloadItems(at: updatedIndexPaths)
             
             }, completion: nil)
         
