@@ -20,6 +20,7 @@
 		19774D6A220C6D7E00EE89A6 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19774D69220C6D7E00EE89A6 /* Constants.swift */; };
 		19774D6C220C869000EE89A6 /* FlickrClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19774D6B220C869000EE89A6 /* FlickrClient.swift */; };
 		19774D6E220CCE9100EE89A6 /* FlickrConvenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19774D6D220CCE9100EE89A6 /* FlickrConvenience.swift */; };
+		19AF38DB22847B2E00B83017 /* MKMapViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AF38DA22847B2E00B83017 /* MKMapViewDelegate.swift */; };
 		19D98EAD22494F1D00B22386 /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19D98EAC22494F1D00B22386 /* PhotoCollectionViewCell.swift */; };
 		19EB9FC22214A09E00ECDEC2 /* PhotoAlbumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19EB9FC12214A09E00ECDEC2 /* PhotoAlbumVC.swift */; };
 /* End PBXBuildFile section */
@@ -40,6 +41,7 @@
 		19774D69220C6D7E00EE89A6 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		19774D6B220C869000EE89A6 /* FlickrClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrClient.swift; sourceTree = "<group>"; };
 		19774D6D220CCE9100EE89A6 /* FlickrConvenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrConvenience.swift; sourceTree = "<group>"; };
+		19AF38DA22847B2E00B83017 /* MKMapViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKMapViewDelegate.swift; sourceTree = "<group>"; };
 		19D98EAC22494F1D00B22386 /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
 		19EB9FC12214A09E00ECDEC2 /* PhotoAlbumVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAlbumVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -86,7 +88,9 @@
 				194B7844220B342300E4E122 /* AppDelegate.swift */,
 				1920ADD3222DA3D90085E325 /* GCDBlackBox.swift */,
 				1934885B221602C1007C1E7C /* Managed Object Extensions */,
+				19AF38D922847ABA00B83017 /* TravelLocationsMapExtension */,
 				194B7858220B391F00E4E122 /* Model */,
+				19AF38D7228479D900B83017 /* Views */,
 				194B7859220B392C00E4E122 /* ViewControllers */,
 				194B7848220B342300E4E122 /* Main.storyboard */,
 				194B784B220B342600E4E122 /* Assets.xcassets */,
@@ -102,7 +106,6 @@
 				194B7856220B390B00E4E122 /* DataController.swift */,
 				19774D6B220C869000EE89A6 /* FlickrClient.swift */,
 				19774D6D220CCE9100EE89A6 /* FlickrConvenience.swift */,
-				19D98EAC22494F1D00B22386 /* PhotoCollectionViewCell.swift */,
 				194B785A220B555300E4E122 /* VirtualTourist.xcdatamodeld */,
 				19774D69220C6D7E00EE89A6 /* Constants.swift */,
 			);
@@ -116,6 +119,30 @@
 				19EB9FC12214A09E00ECDEC2 /* PhotoAlbumVC.swift */,
 			);
 			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		19AF38D7228479D900B83017 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				19AF38D822847A2600B83017 /* Cells */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		19AF38D822847A2600B83017 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				19D98EAC22494F1D00B22386 /* PhotoCollectionViewCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		19AF38D922847ABA00B83017 /* TravelLocationsMapExtension */ = {
+			isa = PBXGroup;
+			children = (
+				19AF38DA22847B2E00B83017 /* MKMapViewDelegate.swift */,
+			);
+			path = TravelLocationsMapExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -190,6 +217,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				19AF38DB22847B2E00B83017 /* MKMapViewDelegate.swift in Sources */,
 				19774D6E220CCE9100EE89A6 /* FlickrConvenience.swift in Sources */,
 				19EB9FC22214A09E00ECDEC2 /* PhotoAlbumVC.swift in Sources */,
 				19774D6A220C6D7E00EE89A6 /* Constants.swift in Sources */,
