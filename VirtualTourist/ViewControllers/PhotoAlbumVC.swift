@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class PhotoAlbumVC: UIViewController, MKMapViewDelegate {
+class PhotoAlbumVC: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var okButton: UIBarButtonItem!
@@ -207,7 +207,6 @@ class PhotoAlbumVC: UIViewController, MKMapViewDelegate {
         
     }
     
-    
     func deleteAllPhotos() {
         
         if let fetchedPhotoArray = fetchedResultsController.fetchedObjects {
@@ -220,7 +219,6 @@ class PhotoAlbumVC: UIViewController, MKMapViewDelegate {
             
         }
     }
-    
     
     func deleteSelectedPhoto() {
         var photosToDelete = fetchedResultsController.fetchedObjects ?? []
@@ -244,27 +242,6 @@ class PhotoAlbumVC: UIViewController, MKMapViewDelegate {
         } else {
             newCollectionButton.title = "New Collection"
         }
-    }
-    
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        
-        
-        let reuseId = "mapPin"
-        
-        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
-        
-        if pinView == nil {
-            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-            pinView!.animatesDrop = true
-            pinView!.pinTintColor = .red
-            
-        }
-            
-        else {
-            pinView!.annotation = annotation
-        }
-        return pinView!
-        
     }
     
     func configureCell(_ cell: PhotoCollectionViewCell, atIndexPath indexPath: IndexPath) {
