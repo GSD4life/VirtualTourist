@@ -25,24 +25,6 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
     @IBOutlet weak var deletePinsLabel: UILabel!
     @IBOutlet weak var editButton: UIBarButtonItem!
     
-    fileprivate func setupFetchResultsController() {
-        let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
-        let sortDescriptor = NSSortDescriptor(key: "latitude", ascending: true)
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        if let result = try? dataController.viewContext.fetch(fetchRequest) {
-            pins = result
-        }
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-        fetchedResultsController.delegate = self
-        
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            fatalError("The fetch request could not be performed: \(error.localizedDescription)")
-        }
-        loadPins()
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
@@ -61,7 +43,6 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
         
     }
     
-    
     // udacity forums
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -72,6 +53,24 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         fetchedResultsController = nil
+    }
+    
+    fileprivate func setupFetchResultsController() {
+        let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "latitude", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        if let result = try? dataController.viewContext.fetch(fetchRequest) {
+            pins = result
+        }
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController.delegate = self
+        
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            fatalError("The fetch request could not be performed: \(error.localizedDescription)")
+        }
+        loadPins()
     }
     
     func savedMapRegion() {
@@ -94,7 +93,6 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
         mapView.addGestureRecognizer(gestureRecognizer)
     }
     
-    
     @IBAction func editButtonPressed(_ sender: Any) {
         if editButton.title == "Edit" {
             editingMode()
@@ -115,7 +113,6 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
         mapView.frame.origin.y += deletePinsLabel.frame.height
         
     }
-    
     
     fileprivate func loadPins() {
         
@@ -170,8 +167,6 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
         
     }
     
-    
-    
     // udacity forums and stackoverflow
     func mapViewRegionDidChangeFromUserInteraction() -> Bool {
         let view = mapView.subviews[0]
@@ -196,54 +191,3 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
     }
 }
 
-//extension TravelLocationsMapVC: MKMapViewDelegate {
-//    
-//    // udacity forums
-//    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-//        if mapViewRegionDidChangeFromUserInteraction() {
-//            let regionToSave = [
-//                "mapRegionCenterLat": mapView.region.center.latitude,
-//                "mapRegionCenterLon": mapView.region.center.longitude,
-//                "mapRegionSpanLatDelta": mapView.region.span.latitudeDelta,
-//                "mapRegionSpanLonDelta": mapView.region.span.longitudeDelta
-//            ]
-//            
-//            let _ = UserDefaults.standard.set(regionToSave, forKey: "savedMapRegion")
-//            
-//        }
-//    }
-//    
-//    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-//        mapView.deselectAnnotation(view.annotation, animated: true)
-//        
-//        guard let pinImage = view.annotation else { return }
-//        
-//        if editButton.title == "Done" {
-//            mapView.removeAnnotation(pinImage)
-//        } else {
-//            let _ = performSegue(withIdentifier: "PhotoAlbumVC", sender: self)
-//        }
-//        
-//    }
-//    
-//    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-//        
-//        let reuseId = "pin"
-//        
-//        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
-//        
-//        if pinView == nil {
-//            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-//            pinView!.animatesDrop = true
-//            pinView!.canShowCallout = true
-//            pinView!.pinTintColor = .red
-//            //pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
-//        }
-//        else {
-//            pinView!.annotation = annotation
-//        }
-//        
-//        return pinView
-//    }
-//    
-//}
