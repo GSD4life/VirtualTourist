@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecognizerDelegate, NSFetchedResultsControllerDelegate {
+class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFetchedResultsControllerDelegate {
     
     var dataController: DataController!
     var fetchedResultsController: NSFetchedResultsController<Pin>!
@@ -165,7 +165,6 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         pin.longitude = location.longitude
         pin.latitude = location.latitude
         pin.creationDate = Date()
-       // let pinId = pin.objectID
         
         guard let _ = try? dataController.viewContext.save() else { return }
         
@@ -187,6 +186,18 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
         return false
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! PhotoAlbumVC
+        destinationVC.coordinates = mapCoordinates
+        destinationVC.dataController = dataController
+        destinationVC.pin = pinObject
+        destinationVC.pin.photos = pinObject.photos
+        
+    }
+}
+
+extension TravelLocationsMapVC: MKMapViewDelegate {
+    
     // udacity forums
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         if mapViewRegionDidChangeFromUserInteraction() {
@@ -200,15 +211,6 @@ class TravelLocationsMapVC: UIViewController, MKMapViewDelegate, UIGestureRecogn
             let _ = UserDefaults.standard.set(regionToSave, forKey: "savedMapRegion")
             
         }
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let destinationVC = segue.destination as! PhotoAlbumVC
-        destinationVC.coordinates = mapCoordinates
-        destinationVC.dataController = dataController
-        destinationVC.pin = pinObject
-        destinationVC.pin.photos = pinObject.photos
-        
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {

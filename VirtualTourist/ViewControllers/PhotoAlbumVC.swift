@@ -47,14 +47,14 @@ class PhotoAlbumVC: UIViewController, MKMapViewDelegate {
         collectionView.delegate = self
         showMapItem()
         setupFetchResultsController()
-        getPhotoURLs()
+    
         updateBottomButton()
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        //loadImagesIfNoneAvailable()
+        loadImagesIfNoneAvailable()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -133,7 +133,7 @@ class PhotoAlbumVC: UIViewController, MKMapViewDelegate {
                         self?.URLArray.append(photoUrls)
                         print(self?.URLArray.count ?? 0)
                     }
-                    self?.collectionView.reloadData()
+                    //self?.collectionView.reloadData()
                 }
                 
             } else {
