@@ -12,6 +12,7 @@ extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("controllerWillChangeContent reached")
+        
         insertedIndexPaths = [IndexPath]()
         updatedIndexPaths = [IndexPath]()
         deletedIndexPaths = [IndexPath]()
@@ -28,12 +29,15 @@ extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
         switch type {
         case .insert:
             insertedIndexPaths.append(newPath)
+//            collectionView.insertItems(at: insertedIndexPaths)
             break
         case .delete:
             deletedIndexPaths.append(path)
+//            collectionView.deleteItems(at: deletedIndexPaths)
             break
         case .update:
             updatedIndexPaths.append(path)
+//            collectionView.reloadItems(at: updatedIndexPaths)
             break
         default:
             break

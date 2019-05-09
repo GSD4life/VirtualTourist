@@ -47,14 +47,14 @@ class PhotoAlbumVC: UIViewController {
         collectionView.delegate = self
         showMapItem()
         setupFetchResultsController()
-    
+        loadImagesIfNoneAvailable()
         updateBottomButton()
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadImagesIfNoneAvailable()
+        //loadImagesIfNoneAvailable()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
