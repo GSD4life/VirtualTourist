@@ -1,5 +1,5 @@
 //
-//  MKMapViewDelegate.swift
+//  MapViewDelegate.swift
 //  VirtualTourist
 //
 //  Created by Shane Sealy on 5/9/19.
