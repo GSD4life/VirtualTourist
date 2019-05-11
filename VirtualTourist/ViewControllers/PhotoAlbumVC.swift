@@ -257,4 +257,34 @@ class PhotoAlbumVC: UIViewController {
         }
     }
     
+    func convertUrlToDisplayData(_ cell: PhotoCollectionViewCell, _ indexPath: IndexPath) {
+        
+        performUIUpdatesOnMain {
+            cell.virtualTouristImageView.image = UIImage(named: "loading")
+            cell.activityViewIndicator.startAnimating()
+            cell.activityViewIndicator.hidesWhenStopped = true
+        }
+        
+        let photoObject = fetchedResultsController.object(at: indexPath)
+        
+        guard let imageUrlString = photoObject.imageURL else { return }
+        guard let url = URL(string: imageUrlString) else { return }
+        
+        DispatchQueue.global(qos: .background).async {
+            
+            guard let photoImageData = FlickrClient.sharedInstance().convertFlickrUrlIntoData(url) else { return }
+            
+            performUIUpdatesOnMain {
+                photoObject.image = photoImageData
+                guard let cellImage = photoObject.image else { return }
+                photoObject.pin = self.pin
+                guard let _ = try? self.dataController.viewContext.save() else { return }
+                cell.virtualTouristImageView.image = UIImage(data: cellImage)
+                cell.setNeedsLayout()
+                cell.activityViewIndicator.stopAnimating()
+            }
+        }
+    }
+       
+    
 }

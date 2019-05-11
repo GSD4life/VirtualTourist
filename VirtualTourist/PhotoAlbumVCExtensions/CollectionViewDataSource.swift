@@ -28,40 +28,8 @@ extension PhotoAlbumVC: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCollectionViewCell", for: indexPath)
             as! PhotoCollectionViewCell
         
-        configureCell(cell, atIndexPath: indexPath)
-        
-        
-        let cellPhotoImage = fetchedResultsController.object(at: indexPath)
-        
-        guard let cellURL = cellPhotoImage.imageURL else { return cell }
-        assert(cellURL == cellPhotoImage.imageURL, "CellURL error, line 209")
-        
-        guard let url = URL(string: cellURL) else { return cell }
-        assert(url == URL(string: cellURL), "Url error within CellForItemAt, line 211")
-        
-        performUIUpdatesOnMain {
-            cell.activityViewIndicator.startAnimating()
-            cell.activityViewIndicator.hidesWhenStopped = true
-        }
-        
-        DispatchQueue.global(qos: .background).async {
-            
-            FlickrClient.sharedInstance().downloadImages(url) { [weak self] (data, error) in
-                guard (error == nil) else { return }
-                assert(error == nil, "FlickrClient download images issue, line 220")
-                if let data = data {
-                    performUIUpdatesOnMain {
-                        cellPhotoImage.image = data
-                        guard let cellImage = cellPhotoImage.image else { return }
-                        cellPhotoImage.pin = self?.pin
-                        guard let _ = try? self?.dataController.viewContext.save() else { return }
-                        cell.virtualTouristImageView.image = UIImage(data: cellImage)
-                        cell.setNeedsLayout()
-                        cell.activityViewIndicator.stopAnimating()
-                    }
-                }
-            }
-        }
+        convertUrlToDisplayData(cell, indexPath)
+
         
         return cell
         

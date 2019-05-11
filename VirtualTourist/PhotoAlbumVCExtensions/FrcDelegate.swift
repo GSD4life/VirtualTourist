@@ -17,7 +17,6 @@ extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
         updatedIndexPaths = [IndexPath]()
         deletedIndexPaths = [IndexPath]()
         
-        
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -27,38 +26,43 @@ extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
         guard let path = indexPath else { return }
         
         switch type {
+            
         case .insert:
             insertedIndexPaths.append(newPath)
-//            collectionView.insertItems(at: insertedIndexPaths)
             break
+            
         case .delete:
             deletedIndexPaths.append(path)
-//            collectionView.deleteItems(at: deletedIndexPaths)
             break
+            
         case .update:
             updatedIndexPaths.append(path)
-//            collectionView.reloadItems(at: updatedIndexPaths)
             break
+            
         default:
             break
         }
     }
     
-    //  Causes collectionView cells to constantly update and blocks CollectionView delegate didSelectItemAt ?
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("controllerDidChangeContent reached")
         
-        collectionView.performBatchUpdates({ [unowned self] () -> Void in
+        // performBatchUpdates - allows multiple insert/delete/reload/move calls to be animated simultaneously.
+        let blockOperations = BlockOperation()
+        
+        blockOperations.addExecutionBlock { [unowned self] in
             
-            self.collectionView.insertItems(at: insertedIndexPaths)
-            
-            self.collectionView.deleteItems(at: deletedIndexPaths)
-            
-            self.collectionView.reloadItems(at: updatedIndexPaths)
-            
-            }, completion: nil)
+            // performBatchUpdates - allows multiple insert/delete/reload/move calls to be animated simultaneously.
+            self.collectionView.performBatchUpdates({ [unowned self] () -> Void in
+                
+                self.collectionView.insertItems(at: self.insertedIndexPaths)
+                
+                self.collectionView.deleteItems(at: self.deletedIndexPaths)
+                
+                self.collectionView.reloadItems(at: self.updatedIndexPaths)
+                
+                }, completion: nil
+            )}
         
     }
-    
 }
-
