@@ -19,6 +19,24 @@ extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
         
     }
     
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
+        print("didChange sectionInfo reached")
+        
+        switch type {
+        
+        case .insert:
+            collectionView.insertSections(IndexSet(integer: sectionIndex))
+            break
+        case .delete:
+            collectionView.deleteSections(IndexSet(integer: sectionIndex))
+            break;
+        default:
+            break
+        }
+    }
+    
+    
+    
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
         print("controller didChange anObject reached")
@@ -60,6 +78,7 @@ extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
                 self.collectionView.deleteItems(at: self.deletedIndexPaths)
                 
                 self.collectionView.reloadItems(at: self.updatedIndexPaths)
+                
                 
                 }, completion: nil
             )}

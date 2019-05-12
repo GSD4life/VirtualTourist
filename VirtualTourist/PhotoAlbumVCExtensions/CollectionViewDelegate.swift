@@ -28,6 +28,5 @@ extension PhotoAlbumVC: UICollectionViewDelegate {
         
         configureCell(cell, atIndexPath: indexPath)
         updateBottomButton()
-        
     }
 }
