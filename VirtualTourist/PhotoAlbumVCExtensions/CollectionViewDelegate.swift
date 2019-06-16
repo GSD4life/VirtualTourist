@@ -20,7 +20,6 @@ extension PhotoAlbumVC: UICollectionViewDelegate {
         if let index = selectedIndexes.firstIndex(of: indexPath) {
             print("selected index reached")
             selectedIndexes.remove(at: index)
-            deleteSelectedPhoto()
             print("selected index removed")
         } else {
             selectedIndexes.append(indexPath)

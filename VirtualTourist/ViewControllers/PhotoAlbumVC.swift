@@ -25,7 +25,6 @@ class PhotoAlbumVC: UIViewController {
     var pin: Pin!
     var photos: [Photo] = []
     var photoURL: URL?
-    var dataForPhotos = Data()
     var images = UIImage()
     var URLArray = [URL]()
     var managedObjectId: NSManagedObjectID?
@@ -55,6 +54,7 @@ class PhotoAlbumVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         //loadImagesIfNoneAvailable()
+        setupFetchResultsController()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -75,7 +75,7 @@ class PhotoAlbumVC: UIViewController {
     
     fileprivate func setupFetchResultsController() {
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
-        let sortDescriptor = NSSortDescriptor(key: "location", ascending: true)
+        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
         let predicate = NSPredicate(format: "pin == %@", pin)
         fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = [sortDescriptor]
@@ -95,19 +95,16 @@ class PhotoAlbumVC: UIViewController {
     fileprivate func loadImagesIfNoneAvailable() {
         
         if let pinPhotos = pin.photos {
-            if pinPhotos.count <= 0 {
+            if pinPhotos.count <= 0 /*&& photos.isEmpty*/ {
                 newCollectionButton.isEnabled = false
                 //noImagesLabelSetup()
                 getPhotoURLs()
             }
-            
         }
     }
-    
     fileprivate func getPhotoURLs() {
         
-        
-        FlickrClient.sharedInstance().getPhotos(self.pin.latitude, self.pin.longitude) { [weak self] (success, arrayOfURLs, error) in
+        FlickrClient.sharedInstance().getPhotos(self.pin.latitude, self.pin.longitude) { [unowned self] (success, arrayOfURLs, error) in
             if success == true {
                 guard let arrayOfURLs = arrayOfURLs else { return }
                 
@@ -116,30 +113,31 @@ class PhotoAlbumVC: UIViewController {
                     for photoUrls in arrayOfURLs  {
                         
                         
-                        let flickrPhoto = Photo(context: (self?.dataController.viewContext)!)
-                        self?.managedObjectId = flickrPhoto.objectID
+                        let flickrPhoto = Photo(context: ((self.dataController.viewContext)))
+                        self.managedObjectId = flickrPhoto.objectID
                         flickrPhoto.name = photoUrls.absoluteString
                         flickrPhoto.creationDate = Date()
                         flickrPhoto.imageURL = photoUrls.absoluteString
-                        flickrPhoto.pin = self?.pin
+                        flickrPhoto.pin = self.pin
                         
-                        self?.flickrPhotoId = flickrPhoto.objectID
+                        self.flickrPhotoId = flickrPhoto.objectID
                         
-                        self?.photos.append(flickrPhoto)
+                        self.photos.append(flickrPhoto)
                         
+                        self.URLArray.append(photoUrls)
                         
-                        self?.saveChanges()
+                        print(self.URLArray.count)
                         
-                        self?.URLArray.append(photoUrls)
-                        print(self?.URLArray.count ?? 0)
+                        self.saveChanges()
                     }
-                    //self?.collectionView.reloadData()
+                        self.collectionView.reloadData() // - reloadData may help to show data immediately after URLS are downloaded, but newCollectionButton is still grayed out.
+                        self.newCollectionButton.isEnabled = true
                 }
                 
             } else {
                 if success == false {
                     guard let error = error else { return }
-                    self?.getPhotosURLAlertView(error.localizedDescription)
+                    self.getPhotosURLAlertView(error.localizedDescription)
                     
                 }
             }
@@ -176,15 +174,31 @@ class PhotoAlbumVC: UIViewController {
     
     @IBAction func newCollectionButtonPressed(_ sender: UIBarButtonItem) {
         
-        guard let pinImages = pin.photos else { return }
-        if pinImages.count <= 0 {
+        if selectedIndexes.isEmpty {
             deleteAllPhotos()
         } else {
-            emptyArrays()
             deleteSelectedPhoto()
             getPhotoURLs()
         }
+        
+//        guard let pinImages = pin.photos else { return }
+//        if pinImages.count <= 0 {
+//            deleteAllPhotos()
+//        } else {
+//            emptyArrays()
+//            deleteSelectedPhoto()
+//            getPhotoURLs()
+//        }
     }
+    
+    //fileprivate func reloadCollectionView() {
+    //        selectedIndexes.forEach { (indexPath) in
+    //            performUIUpdatesOnMain { [weak self] in
+    //                self?.collectionView.deselectItem(at: indexPath, animated: true)
+    //                self?.collectionView.reloadItems(at: self?.selectedIndexes ?? [])
+    //                self?.collectionView.scrollToItem(at: indexPath, at: .right, animated: true)
+    //            }
+    //        }
     
     @IBAction func okButtonPressed(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
@@ -204,7 +218,6 @@ class PhotoAlbumVC: UIViewController {
                 self?.noImagesLabel.isHidden = true
             }
         }
-        
     }
     
     func deleteAllPhotos() {
@@ -221,13 +234,13 @@ class PhotoAlbumVC: UIViewController {
     }
     
     func deleteSelectedPhoto() {
-        var photosToDelete = fetchedResultsController.fetchedObjects ?? []
+        photos = fetchedResultsController.fetchedObjects ?? []
         
         for indexPath in selectedIndexes {
-            photosToDelete.append(fetchedResultsController.object(at: indexPath) )
+            photos.append(fetchedResultsController.object(at: indexPath) )
         }
         
-        for photo in photosToDelete {
+        for photo in photos {
             dataController.viewContext.delete(photo)
             saveChanges()
         }
@@ -266,25 +279,25 @@ class PhotoAlbumVC: UIViewController {
         }
         
         let photoObject = fetchedResultsController.object(at: indexPath)
-        
         guard let imageUrlString = photoObject.imageURL else { return }
         guard let url = URL(string: imageUrlString) else { return }
         
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .userInitiated).async {
             
             guard let photoImageData = FlickrClient.sharedInstance().convertFlickrUrlIntoData(url) else { return }
             
-            performUIUpdatesOnMain {
+            performUIUpdatesOnMain { [weak self] in
                 photoObject.image = photoImageData
                 guard let cellImage = photoObject.image else { return }
-                photoObject.pin = self.pin
-                guard let _ = try? self.dataController.viewContext.save() else { return }
+                photoObject.pin = self?.pin
+                self?.saveChanges()
                 cell.virtualTouristImageView.image = UIImage(data: cellImage)
                 cell.setNeedsLayout()
                 cell.activityViewIndicator.stopAnimating()
             }
         }
     }
-       
+    
+    
     
 }

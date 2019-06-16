@@ -11,30 +11,11 @@ import CoreData
 extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        print("controllerWillChangeContent reached")
         
         insertedIndexPaths = [IndexPath]()
-        updatedIndexPaths = [IndexPath]()
         deletedIndexPaths = [IndexPath]()
-        
+        updatedIndexPaths = [IndexPath]()
     }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-        print("didChange sectionInfo reached")
-        
-        switch type {
-        
-        case .insert:
-            collectionView.insertSections(IndexSet(integer: sectionIndex))
-            break
-        case .delete:
-            collectionView.deleteSections(IndexSet(integer: sectionIndex))
-            break;
-        default:
-            break
-        }
-    }
-    
     
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -46,15 +27,21 @@ extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
         switch type {
             
         case .insert:
+            print("Insert an item")
             insertedIndexPaths.append(newPath)
             break
             
         case .delete:
+            print("Delete an item")
             deletedIndexPaths.append(path)
             break
             
         case .update:
+            print("update an item")
             updatedIndexPaths.append(path)
+            break
+            
+        case .move:
             break
             
         default:
@@ -63,25 +50,23 @@ extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        print("controllerDidChangeContent reached")
         
-        // performBatchUpdates - allows multiple insert/delete/reload/move calls to be animated simultaneously.
-        let blockOperations = BlockOperation()
+        print("in controllerDidChangeContent. changes.count: \(insertedIndexPaths.count + deletedIndexPaths.count)")
         
-        blockOperations.addExecutionBlock { [unowned self] in
-            
-            // performBatchUpdates - allows multiple insert/delete/reload/move calls to be animated simultaneously.
-            self.collectionView.performBatchUpdates({ [unowned self] () -> Void in
-                
-                self.collectionView.insertItems(at: self.insertedIndexPaths)
-                
-                self.collectionView.deleteItems(at: self.deletedIndexPaths)
-                
-                self.collectionView.reloadItems(at: self.updatedIndexPaths)
-                
-                
-                }, completion: nil
-            )}
+        
+        deletedIndexPaths.forEach({ (indexPath) in
+            collectionView.deleteItems(at: [indexPath])
+        })
+        
+        insertedIndexPaths.forEach({ (indexPath) in
+            collectionView.insertItems(at: [indexPath])
+        })
+        
+        updatedIndexPaths.forEach({ (indexPath) in
+            collectionView.reloadItems(at: [indexPath])
+        })
         
     }
+    
+    
 }

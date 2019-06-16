@@ -40,7 +40,7 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        setupFetchResultsController()
     }
     
     // udacity forums
@@ -147,8 +147,6 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
             let annotation = MKPointAnnotation()
             annotation.coordinate = location
             mapCoordinates = location
-            //annotation.title = "Ninpo"
-            
             
             mapView.addAnnotation(annotation)
             addPin(location: location)
@@ -157,11 +155,10 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
     
     func addPin(location: CLLocationCoordinate2D) {
         let pin = Pin(context: dataController.viewContext)
-        pinObject = pin
-        pinObject.photos = pin.photos
         pin.longitude = location.longitude
         pin.latitude = location.latitude
         pin.creationDate = Date()
+        pinObject = pin
         
         guard let _ = try? dataController.viewContext.save() else { return }
         
@@ -182,12 +179,13 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let destinationVC = segue.destination as! PhotoAlbumVC
+        
+        guard let destinationVC = segue.destination as? PhotoAlbumVC else { fatalError("unable to segue to PhotoAlbumVC") }
+       
         destinationVC.coordinates = mapCoordinates
         destinationVC.dataController = dataController
         destinationVC.pin = pinObject
-        destinationVC.pin.photos = pinObject.photos
-        
-    }
+
 }
 
+}

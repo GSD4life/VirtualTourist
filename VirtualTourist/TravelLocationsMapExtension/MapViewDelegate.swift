@@ -30,6 +30,18 @@ extension TravelLocationsMapVC: MKMapViewDelegate {
         
         guard let pinImage = view.annotation else { return }
         
+        guard let _ = try? fetchedResultsController.performFetch() else {
+            print("Not able to fetch pin objects - line 34 of mapView delegate")
+            return }
+        
+      let fetchedPinObjects = fetchedResultsController.fetchedObjects ?? []
+
+        fetchedPinObjects.forEach { (pin) in
+            if pin.latitude == pinImage.coordinate.latitude && pin.longitude == pinImage.coordinate.longitude {
+                pinObject = pin
+            }
+        }
+        
         if editButton.title == "Done" {
             mapView.removeAnnotation(pinImage)
         } else {
