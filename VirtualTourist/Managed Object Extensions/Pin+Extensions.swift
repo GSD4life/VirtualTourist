@@ -16,3 +16,6 @@ extension Pin {
         creationDate = Date()
     }
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.

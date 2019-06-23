@@ -38,3 +38,6 @@ extension PhotoAlbumVC: UICollectionViewDataSource {
         
     }
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.

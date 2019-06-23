@@ -71,3 +71,6 @@ struct Constants {
     // Flickr Apikey = 56447b2d3b5ee20e41a5375212029b21
     
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.

@@ -16,3 +16,6 @@ class PhotoCollectionViewCell: UICollectionViewCell {
     
     
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.

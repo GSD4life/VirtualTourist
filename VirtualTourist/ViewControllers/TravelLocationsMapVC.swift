@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFetchedResultsControllerDelegate {
+final class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFetchedResultsControllerDelegate {
     
     var dataController: DataController!
     var fetchedResultsController: NSFetchedResultsController<Pin>!
@@ -189,3 +189,6 @@ class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate, NSFet
 }
 
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.

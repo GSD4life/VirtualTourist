@@ -8,7 +8,7 @@
 
 import UIKit
 
-class FlickrClient {
+final class FlickrClient {
     
     var imageString: URL?
     var randomPageNumber: Int = 0
@@ -99,3 +99,6 @@ class FlickrClient {
     }
     
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.

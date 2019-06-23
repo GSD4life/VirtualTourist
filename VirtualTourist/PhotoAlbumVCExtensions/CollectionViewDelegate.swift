@@ -29,3 +29,6 @@ extension PhotoAlbumVC: UICollectionViewDelegate {
         updateBottomButton()
     }
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.

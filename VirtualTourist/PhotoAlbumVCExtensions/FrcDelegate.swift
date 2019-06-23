@@ -62,11 +62,14 @@ extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
             collectionView.insertItems(at: [indexPath])
         })
         
-        updatedIndexPaths.forEach({ (indexPath) in
-            collectionView.reloadItems(at: [indexPath])
-        })
+//        updatedIndexPaths.forEach({ (indexPath) in
+//            collectionView.reloadItems(at: [indexPath])
+//        })
         
     }
     
     
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.

@@ -71,3 +71,6 @@ extension TravelLocationsMapVC: MKMapViewDelegate {
     }
     
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.

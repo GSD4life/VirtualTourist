@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-class DataController {
+final class DataController {
     
     let persistentContainer: NSPersistentContainer
     
@@ -33,6 +33,7 @@ class DataController {
     
 }
 
-
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.
 
 

@@ -13,3 +13,6 @@ func performUIUpdatesOnMain(_ updates: @escaping () -> Void) {
         updates()
     }
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.

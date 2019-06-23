@@ -31,3 +31,6 @@ extension PhotoAlbumVC: MKMapViewDelegate {
         
     }
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.

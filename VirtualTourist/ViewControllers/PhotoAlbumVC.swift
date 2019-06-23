@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class PhotoAlbumVC: UIViewController {
+final class PhotoAlbumVC: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var okButton: UIBarButtonItem!
@@ -25,7 +25,6 @@ class PhotoAlbumVC: UIViewController {
     var pin: Pin!
     var photos: [Photo] = []
     var photoURL: URL?
-    var images = UIImage()
     var URLArray = [URL]()
     var managedObjectId: NSManagedObjectID?
     var selectedIndexes = [IndexPath]()
@@ -53,7 +52,6 @@ class PhotoAlbumVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        //loadImagesIfNoneAvailable()
         setupFetchResultsController()
     }
     
@@ -130,8 +128,10 @@ class PhotoAlbumVC: UIViewController {
                         
                         self.saveChanges()
                     }
-                        self.collectionView.reloadData() // - reloadData may help to show data immediately after URLS are downloaded, but newCollectionButton is still grayed out.
-                        self.newCollectionButton.isEnabled = true
+                    
+                    self.collectionView.reloadData()
+                    self.newCollectionButton.isEnabled = true
+
                 }
                 
             } else {
@@ -165,6 +165,18 @@ class PhotoAlbumVC: UIViewController {
     
     func showMapItem() {
         
+        let latitude = coordinates.latitude
+        let longitude = coordinates.longitude
+        
+        let latitudeDelta  = 0.7
+        let longitudeDelta = 0.7
+        
+        let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
+        
+        let region = MKCoordinateRegion(center: center, span: span)
+        mapView.setRegion(region, animated: true)
+        
         let annotation = MKPointAnnotation()
         annotation.coordinate = coordinates
         mapView.addAnnotation(annotation)
@@ -174,51 +186,22 @@ class PhotoAlbumVC: UIViewController {
     
     @IBAction func newCollectionButtonPressed(_ sender: UIBarButtonItem) {
         
-        if selectedIndexes.isEmpty {
+        if selectedIndexes.isEmpty  {
+            print("selectedIndex is EMPTY")
             deleteAllPhotos()
         } else {
+            print("selectedIndex is NOT EMPTY")
             deleteSelectedPhoto()
+            emptyArrays()
             getPhotoURLs()
         }
-        
-//        guard let pinImages = pin.photos else { return }
-//        if pinImages.count <= 0 {
-//            deleteAllPhotos()
-//        } else {
-//            emptyArrays()
-//            deleteSelectedPhoto()
-//            getPhotoURLs()
-//        }
     }
     
-    //fileprivate func reloadCollectionView() {
-    //        selectedIndexes.forEach { (indexPath) in
-    //            performUIUpdatesOnMain { [weak self] in
-    //                self?.collectionView.deselectItem(at: indexPath, animated: true)
-    //                self?.collectionView.reloadItems(at: self?.selectedIndexes ?? [])
-    //                self?.collectionView.scrollToItem(at: indexPath, at: .right, animated: true)
-    //            }
-    //        }
     
     @IBAction func okButtonPressed(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
     }
     
-    func noImagesLabelSetup() {
-        performUIUpdatesOnMain { [weak self] in
-            
-            guard let pinPhotos = self?.pin.photos?.count else { return }
-            
-            if pinPhotos == 0 {
-                self?.noImagesLabel.isHidden = false
-                self?.noImagesLabel.textAlignment = .center
-                self?.noImagesLabel.text = "This pin has no images"
-                
-            } else {
-                self?.noImagesLabel.isHidden = true
-            }
-        }
-    }
     
     func deleteAllPhotos() {
         
@@ -229,18 +212,17 @@ class PhotoAlbumVC: UIViewController {
                 saveChanges()
             }
             
-            
         }
     }
     
     func deleteSelectedPhoto() {
-        photos = fetchedResultsController.fetchedObjects ?? []
+        var photosToDelete = [Photo]()
         
         for indexPath in selectedIndexes {
-            photos.append(fetchedResultsController.object(at: indexPath) )
+            photosToDelete.append(fetchedResultsController.object(at: indexPath) )
         }
         
-        for photo in photos {
+        for photo in photosToDelete {
             dataController.viewContext.delete(photo)
             saveChanges()
         }
@@ -272,32 +254,51 @@ class PhotoAlbumVC: UIViewController {
     
     func convertUrlToDisplayData(_ cell: PhotoCollectionViewCell, _ indexPath: IndexPath) {
         
-        performUIUpdatesOnMain {
-            cell.virtualTouristImageView.image = UIImage(named: "loading")
-            cell.activityViewIndicator.startAnimating()
-            cell.activityViewIndicator.hidesWhenStopped = true
-        }
+        cell.virtualTouristImageView.image = UIImage(named: "loading")
+        cell.activityViewIndicator.startAnimating()
+        cell.activityViewIndicator.hidesWhenStopped = true
         
         let photoObject = fetchedResultsController.object(at: indexPath)
         guard let imageUrlString = photoObject.imageURL else { return }
         guard let url = URL(string: imageUrlString) else { return }
         
-        DispatchQueue.global(qos: .userInitiated).async {
+        if photoObject.image != nil {
+            print("we have stored photos, so no need to download")
+            guard let imageForCell = photoObject.image else { return }
+            cell.virtualTouristImageView.image = UIImage(data: imageForCell)
+            cell.activityViewIndicator.stopAnimating()
             
-            guard let photoImageData = FlickrClient.sharedInstance().convertFlickrUrlIntoData(url) else { return }
+        } else {
             
-            performUIUpdatesOnMain { [weak self] in
-                photoObject.image = photoImageData
-                guard let cellImage = photoObject.image else { return }
-                photoObject.pin = self?.pin
-                self?.saveChanges()
-                cell.virtualTouristImageView.image = UIImage(data: cellImage)
-                cell.setNeedsLayout()
-                cell.activityViewIndicator.stopAnimating()
+            DispatchQueue.global(qos: .userInitiated).async {
+                
+                guard let photoImageData = FlickrClient.sharedInstance().convertFlickrUrlIntoData(url) else { return }
+                
+                performUIUpdatesOnMain { [weak self] in
+                    photoObject.image = photoImageData
+                    guard let cellImage = photoObject.image else { return }
+                    cell.virtualTouristImageView.image = UIImage(data: cellImage)
+                    cell.activityViewIndicator.stopAnimating()
+                    
+                    if photoObject.image == nil {
+                        print("photoObject is nil, so a URL will be used and converted to Data")
+                        photoObject.pin = self?.pin
+                        self?.saveChanges()
+                        cell.virtualTouristImageView.image = UIImage(data: cellImage)
+                        cell.setNeedsLayout()
+                        cell.activityViewIndicator.stopAnimating()
+                    }
+                }
             }
         }
+        
     }
     
-    
+    deinit {
+        print("PhotoAlbumVC has been deinitialized")
+    }
     
 }
+
+// Sources:
+// Udacity IOS program, Udacity forums, and mentors.
