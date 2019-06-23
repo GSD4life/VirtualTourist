@@ -72,4 +72,5 @@ extension PhotoAlbumVC: NSFetchedResultsControllerDelegate {
 }
 
 // Sources:
-// Udacity IOS program, Udacity forums, and mentors.
+// Udacity IOS program (including Udacity GitHub colorCollection), Udacity forums, and mentors.
+
