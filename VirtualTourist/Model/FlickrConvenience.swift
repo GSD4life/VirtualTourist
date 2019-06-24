@@ -27,7 +27,7 @@ extension FlickrClient {
             Constants.FlickrParameterKeys.BoundingBox: bboxString(latitude, longitude),
             Constants.FlickrParameterKeys.PhotosPerPage: Constants.FlickrParameterValues.ResponsePerPage,
             Constants.FlickrParameterKeys.Page: randomPageNumber
-        ] as [String:AnyObject]
+            ] as [String:AnyObject]
         
         
         let _ = taskForGet(parameters: methodParameters) { [weak self] (data, error) in
@@ -46,7 +46,7 @@ extension FlickrClient {
                     displayError("Flickr API returned an error. See error code and message in \(data)")
                     return
                 }
-            
+                
                 
                 guard let photosDictionary = data[Constants.FlickrResponseKeys.Photos] as? [String: AnyObject] else {
                     displayError("Cannot find keys '\(Constants.FlickrResponseKeys.Photos)' in \(data)")

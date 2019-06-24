@@ -34,8 +34,8 @@ extension TravelLocationsMapVC: MKMapViewDelegate {
             print("Not able to fetch pin objects - line 34 of mapView delegate")
             return }
         
-      let fetchedPinObjects = fetchedResultsController.fetchedObjects ?? []
-
+        let fetchedPinObjects = fetchedResultsController.fetchedObjects ?? []
+        
         fetchedPinObjects.forEach { (pin) in
             if pin.latitude == pinImage.coordinate.latitude && pin.longitude == pinImage.coordinate.longitude {
                 pinObject = pin
@@ -61,7 +61,7 @@ extension TravelLocationsMapVC: MKMapViewDelegate {
             pinView!.animatesDrop = true
             pinView!.canShowCallout = true
             pinView!.pinTintColor = .red
-            //pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+            
         }
         else {
             pinView!.annotation = annotation

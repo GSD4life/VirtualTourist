@@ -12,7 +12,6 @@ extension PhotoAlbumVC: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
-        
         let reuseId = "mapPin"
         
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
@@ -22,13 +21,10 @@ extension PhotoAlbumVC: MKMapViewDelegate {
             pinView!.animatesDrop = true
             pinView!.pinTintColor = .red
             
-        }
-            
-        else {
+        } else {
             pinView!.annotation = annotation
         }
         return pinView!
-        
     }
 }
 

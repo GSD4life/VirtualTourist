@@ -16,23 +16,17 @@ extension PhotoAlbumVC: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        print("numberOfItemsinSection reached")
-        
         let sections = fetchedResultsController.sections?[section].numberOfObjects ?? 0
-
-        print("number of sections: \(sections)")
+        
         return sections
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        print("cellForItemAt called")
-        
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCollectionViewCell", for: indexPath)
             as? PhotoCollectionViewCell else { fatalError("The wrong cell was made available")}
         
         convertUrlToDisplayData(cell, indexPath)
-
         
         return cell
         

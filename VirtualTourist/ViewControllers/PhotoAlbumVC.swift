@@ -93,9 +93,8 @@ final class PhotoAlbumVC: UIViewController {
     fileprivate func loadImagesIfNoneAvailable() {
         
         if let pinPhotos = pin.photos {
-            if pinPhotos.count <= 0 /*&& photos.isEmpty*/ {
+            if pinPhotos.count <= 0  {
                 newCollectionButton.isEnabled = false
-                //noImagesLabelSetup()
                 getPhotoURLs()
             }
         }
@@ -124,14 +123,17 @@ final class PhotoAlbumVC: UIViewController {
                         
                         self.URLArray.append(photoUrls)
                         
-                        print(self.URLArray.count)
-                        
                         self.saveChanges()
                     }
                     
                     self.collectionView.reloadData()
                     self.newCollectionButton.isEnabled = true
-
+                    
+                }
+                performUIUpdatesOnMain {
+                    if self.fetchedResultsController.fetchedObjects?.isEmpty ?? true {
+                        self.labelSetup()
+                    }
                 }
                 
             } else {
@@ -144,6 +146,13 @@ final class PhotoAlbumVC: UIViewController {
         }
     }
     
+    func labelSetup() {
+        noImagesLabel.isHidden = false
+        noImagesLabel.textAlignment = .center
+        noImagesLabel.text = "There are no images for this pin"
+        newCollectionButton.isEnabled = false
+    }
+    
     fileprivate func getPhotosURLAlertView(_ error: String?) {
         let alertViewController = UIAlertController(title: "Download Error", message: "The request most likely timed out.", preferredStyle: .alert)
         alertViewController.addAction(UIAlertAction(title: "Okay", style: .cancel, handler: nil))
@@ -152,9 +161,7 @@ final class PhotoAlbumVC: UIViewController {
     
     func saveChanges() {
         if dataController.viewContext.hasChanges {
-            guard let _ = try? dataController.viewContext.save() else {
-                print("unable to save")
-                return }
+            guard let _ = try? dataController.viewContext.save() else { return }
         }
     }
     
@@ -187,13 +194,12 @@ final class PhotoAlbumVC: UIViewController {
     @IBAction func newCollectionButtonPressed(_ sender: UIBarButtonItem) {
         
         if selectedIndexes.isEmpty  {
-            print("selectedIndex is EMPTY")
             deleteAllPhotos()
-        } else {
-            print("selectedIndex is NOT EMPTY")
-            deleteSelectedPhoto()
             emptyArrays()
             getPhotoURLs()
+        } else {
+            deleteSelectedPhoto()
+            collectionView.reloadData()
         }
     }
     
@@ -232,11 +238,7 @@ final class PhotoAlbumVC: UIViewController {
     
     func updateBottomButton() {
         
-        if selectedIndexes.count > 0 {
-            newCollectionButton.title = "Remove Selected Picture"
-        } else {
-            newCollectionButton.title = "New Collection"
-        }
+        newCollectionButton.title = selectedIndexes.count > 0 ? "Remove Selected Picture" : "New Collection"
     }
     
     func configureCell(_ cell: PhotoCollectionViewCell, atIndexPath indexPath: IndexPath) {
@@ -263,7 +265,6 @@ final class PhotoAlbumVC: UIViewController {
         guard let url = URL(string: imageUrlString) else { return }
         
         if photoObject.image != nil {
-            print("we have stored photos, so no need to download")
             guard let imageForCell = photoObject.image else { return }
             cell.virtualTouristImageView.image = UIImage(data: imageForCell)
             cell.activityViewIndicator.stopAnimating()
@@ -281,7 +282,6 @@ final class PhotoAlbumVC: UIViewController {
                     cell.activityViewIndicator.stopAnimating()
                     
                     if photoObject.image == nil {
-                        print("photoObject is nil, so a URL will be used and converted to Data")
                         photoObject.pin = self?.pin
                         self?.saveChanges()
                         cell.virtualTouristImageView.image = UIImage(data: cellImage)

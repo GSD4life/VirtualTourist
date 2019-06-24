@@ -26,7 +26,7 @@ final class FlickrClient {
                 let userInfo = [NSLocalizedDescriptionKey: error]
                 completionHandlerForGet(nil, NSError(domain: "taskForGet", code: 1, userInfo: userInfo))
             }
-           
+            
             guard (error == nil) else {
                 sendError("There was an error with your request: \(error?.localizedDescription ?? "Unable to get data")")
                 return
@@ -43,7 +43,6 @@ final class FlickrClient {
                 sendError("No data was returned by the request!")
                 return
             }
-            
             
             self.convertDataWithCompletionHandler(data, completionHandlerForGet)
             

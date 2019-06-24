@@ -12,15 +12,13 @@ import UIKit
 extension PhotoAlbumVC: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("didSelectItemAT function reached")
+        
         
         guard let cell = collectionView.cellForItem(at: indexPath) as? PhotoCollectionViewCell else { return }
         
         // Whenever a cell is tapped we will toggle its presence in the selectedIndexes array
         if let index = selectedIndexes.firstIndex(of: indexPath) {
-            print("selected index reached")
             selectedIndexes.remove(at: index)
-            print("selected index removed")
         } else {
             selectedIndexes.append(indexPath)
         }

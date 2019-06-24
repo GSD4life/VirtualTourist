@@ -181,13 +181,13 @@ final class TravelLocationsMapVC: UIViewController, UIGestureRecognizerDelegate,
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         guard let destinationVC = segue.destination as? PhotoAlbumVC else { fatalError("unable to segue to PhotoAlbumVC") }
-       
+        
         destinationVC.coordinates = mapCoordinates
         destinationVC.dataController = dataController
         destinationVC.pin = pinObject
-
-}
-
+        
+    }
+    
 }
 
 // Sources:
