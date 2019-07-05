@@ -27,6 +27,6 @@ PhotoAlbumView
 ### Installation:
 
 1. git clone: https://github.com/GSD4life/VirtualTourist.git
-2. cd <YourProjectName>
+2. cd YourProjectName - the name of your project
 3. Pod install
-4. Open <YourProjectName>.xcworkspace
+4. Open YourProjectName.xcworkspace
