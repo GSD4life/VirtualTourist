@@ -6,7 +6,7 @@ The Virtual Tourist app downloads and stores images from Flickr. Users will be a
 
 The app first loads a mapView where the user can use the standard scroll and zoom features. Tapping and holding the map will drop a new pin. If a pin is tapped the app will transition to the Photo Album view using the coordinates of that pin.
 
-The Photo Album view loads and attempts to download images from Flickr based on the latitude and longitude of the selected pin. If images are available, the view will show a mapView at the top and images below the map within a collectionView. Once the images are downloaded a newCollectionButton will become visible at the bottom of the page. Tapping the newCollectionButton will empty the collectionView and attempt to download a new set of images of Flickr.
+The Photo Album view loads and attempts to download images from Flickr based on the latitude and longitude of the selected pin. If images are available, the view will show a mapView at the top and images below the map within a collectionView. Once the images are downloaded a newCollectionButton will become visible at the bottom of the page. Tapping the newCollectionButton will empty the collectionView and attempt to download a new set of images from Flickr.
 
 Users are able to remove an image from the collectionView by first tapping an image, followed by tapping the newCollectionButton which now has the title "Remove Selected Picture". The remaining images should move to fill in the newly empty space.
 
