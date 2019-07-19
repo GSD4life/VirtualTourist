@@ -16,6 +16,8 @@ All changes made in the Photo Album view are made persistent in Core Data.
 
 Tapping the Ok button in the Photo Album view returns the user to the first view (mapView) of the app. If the user decides to  tap a pin which already has a set of images, the app will load the images from Core Data, instead of trying to download images from Flickr when transitioning to the Photo Album view.
 
+source: Udacity IOS Nanodegree program - 2019
+
 TravelLocationsMapView 
 
 <img width="221" alt="TravelLocationsMapView" src="https://user-images.githubusercontent.com/35928028/60674626-83591c80-9e48-11e9-8d52-0977c69c453e.png">
